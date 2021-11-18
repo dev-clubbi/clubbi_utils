@@ -4,10 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-setuptools = "*"
-wheel = "*"
+aiobotocore = ">=1,<2"
+pydantic = ">=1,<2"
+aiomysql = "*"
 
 [dev-packages]
+pytest = "*"
+coverage = "*"
+mypy = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.9"

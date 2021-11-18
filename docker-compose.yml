@@ -1,0 +1,12 @@
+version: '2.1'
+services:
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - '4566:4566'
+    environment:
+      - DEFAULT_REGION=us-east-1
+      - LAMBDA_EXECUTOR=docker
+      - DATA_DIR=/tmp/localstack/data
+      - SERVICES=${SERVICES- }
+      - DEBUG=1
