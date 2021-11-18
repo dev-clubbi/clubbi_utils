@@ -2,9 +2,9 @@ from typing import Optional, Dict, Any
 
 from aiobotocore.client import AioBaseClient
 
-from src.clubbi.json import dumps
+from clubbi.json import dumps
 
-from src.clubbi import logger
+from clubbi import logger
 
 
 class SNSPublisher:

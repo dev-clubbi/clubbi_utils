@@ -2,8 +2,8 @@ from unittest import IsolatedAsyncioTestCase
 
 import aiobotocore
 
-from src.clubbi.aws.ses_mailer import SesMailer
-from src.clubbi.mailer import Email, EmailAttachment
+from clubbi.aws.ses_mailer import SesMailer
+from clubbi.mailer import Email, EmailAttachment
 from tests.aws.localstack_targets import create_test_client
 
 
