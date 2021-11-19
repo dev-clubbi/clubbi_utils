@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import aiobotocore
 
-from clubbi.aws.sns_publisher import SNSPublisher
+from clubbi_utils.aws.sns_publisher import SNSPublisher
 from tests.aws.localstack_targets import create_test_client
 
 
