@@ -5,8 +5,8 @@ from os import getenv
 
 from aiobotocore.client import AioBaseClient
 
-from clubbi.logger import logger
-from clubbi.mailer import Email
+from clubbi_utils.logger import logger
+from clubbi_utils.mailer import Email
 
 CLUBBI_CONTROL_EMAIL = getenv('CLUBBI_CONTROL_EMAIL', 'success@simulator.amazonses.com')
 

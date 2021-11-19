@@ -1,6 +1,6 @@
 from typing import Any, Callable, Coroutine, TypeVar
 
-from clubbi.mysql.mysql_connector import create_mysql_engine
+from clubbi_utils.mysql.mysql_connector import create_mysql_engine
 
 F = TypeVar('F', bound=Callable[..., Coroutine[Any, Any, Any]], )
 T = TypeVar('T')
