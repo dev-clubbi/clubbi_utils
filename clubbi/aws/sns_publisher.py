@@ -4,7 +4,7 @@ from aiobotocore.client import AioBaseClient
 
 from clubbi.json import dumps
 
-from clubbi import logger
+from clubbi.logger import logger
 
 
 class SNSPublisher:
