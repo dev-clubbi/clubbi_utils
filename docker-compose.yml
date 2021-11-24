@@ -10,3 +10,5 @@ services:
       - DATA_DIR=/tmp/localstack/data
       - SERVICES=${SERVICES- }
       - DEBUG=1
+    volumes:
+      - ./aws:/docker-entrypoint-initaws.d
