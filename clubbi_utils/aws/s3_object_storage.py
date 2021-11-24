@@ -72,6 +72,11 @@ class S3ObjectStorage:
         async with body_stream as stream:
             while chunk := await stream.read(chunk_length):
                 yield chunk
+    
+    async def mkdir(self, key: str) -> None:
+        if not key.endswith("/"):
+            key = f"{key}/"
+        await self._put_object(data=b"", name=key)
 
     async def get_object(self, key: str, full_key: bool = False) -> bytes:
         if full_key is False:
