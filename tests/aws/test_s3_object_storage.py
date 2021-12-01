@@ -76,6 +76,7 @@ class TestS3ObjectStorage(IsolatedAsyncioTestCase):
     async def test_list_objects(self):
         async with create_test_client(self._session, 's3') as client:
             storage = S3ObjectStorage(client, BUCKET_NAME)
+            self.assertEqual(await storage.list_objects("folder"), [])
             
             file_names = [f"folder/file{i}.txt" for i in range(10)]
             
