@@ -85,7 +85,7 @@ class S3ObjectStorage:
         objects = []
         paginator = self._client.get_paginator('list_objects_v2')
         async for result in paginator.paginate(Bucket=self._bucket, Prefix=self._build_key(prefix)):
-            objects += [obj['Key'][len(self.key_prefix):] for obj in result['Contents']]
+            objects += [obj['Key'][len(self.key_prefix):] for obj in result.get('Contents', [])]
 
         return objects
 
