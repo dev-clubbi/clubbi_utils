@@ -1,10 +1,14 @@
-from collections import Callable
-from functools import lru_cache
+from collections import Any, Callable
+from functools import lru_cache, wraps
+from os import getenv
 from typing import Optional
 
 import aiobotocore
 from aiobotocore import AioSession
 
+from clubbi_utils.aws.local_mocks.s3_object_storage_local_mock import S3ObjectStorageLocalMock
+from clubbi_utils.aws.s3_object_storage import S3ObjectStorage
+from aiobotocore.client import AioBaseClient
 
 @lru_cache
 def _get_session() -> AioSession:
@@ -23,3 +27,47 @@ def with_aws_client(name: str, region_name: Optional[str] = None) -> Callable:
         return wrapper
 
     return wrap
+
+@lru_cache
+def _get_cached_local_mock(
+    bucket_name: str,
+    key_prefix: str,
+) -> S3ObjectStorageLocalMock:
+    return S3ObjectStorageLocalMock(
+        name=bucket_name,
+        key_prefix=key_prefix,
+    )
+
+
+def with_object_storage(
+    bucket_name: str,
+    key_prefix: str = "",
+    region_name: str = "us-east-1",
+    env: str = None,
+) -> Callable:
+    """Injects a positional parameter which is a S3ObjectStorage if env is staging or production
+    otherwise returns a cached S3ObjectStorageLocalMock."""
+    env = env or getenv("ENVIRONMENT")
+
+    def prod_staging_decorator(f: Callable) -> Callable:
+        @wraps(f)
+        @with_aws_client("s3", region_name=region_name)
+        async def wrapper(client: AioBaseClient, *args: Any, **kwargs: Any) -> Any:
+            object_storage = S3ObjectStorage(
+                client=client,
+                bucket=bucket_name,
+                key_prefix=key_prefix,
+            )
+            return await f(object_storage, *args, **kwargs)
+        return wrapper
+    
+    def local_decorator(f: Callable) -> Callable:
+        @wraps(f)
+        async def wrapper(*args: Any, **kwargs: Any) -> Any:
+            object_storage = _get_cached_local_mock(bucket_name, key_prefix)
+            return await f(object_storage, *args, **kwargs)
+        return wrapper
+
+    if env in {"production", "staging"}:
+         return prod_staging_decorator
+    return local_decorator
