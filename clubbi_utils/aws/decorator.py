@@ -1,7 +1,6 @@
-from collections import Any, Callable
 from functools import lru_cache, wraps
 from os import getenv
-from typing import Optional
+from typing import Optional, Any, Callable
 
 import aiobotocore
 from aiobotocore import AioSession
