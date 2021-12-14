@@ -12,7 +12,7 @@ class SNSPublisher:
         self.topic_arn = topic_arn
         self._client = client
 
-    async def publish(self, message: Any, attributes:  Optional[Dict[str, str]] = None) -> None:
+    async def publish(self, message: Any, attributes:  Optional[Dict[str, str]] = None, message_group_id: Optional[str] = None) -> None:
         json_body = dumps(message)
         message_attributes = {}
         if attributes:
@@ -23,11 +23,14 @@ class SNSPublisher:
                 ) for k, v in attributes.items()
             }
 
-        response = await self._client.publish(
+        publish_kwargs = dict(
             TopicArn=self.topic_arn,
             Message=json_body,
             MessageAttributes=message_attributes
         )
+        if message_group_id is not None:
+            publish_kwargs["MessageGroupId"] = message_group_id
+        response = await self._client.publish(**publish_kwargs)
         logger.info(
             {
                 'MessageId': response
