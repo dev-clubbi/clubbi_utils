@@ -8,6 +8,7 @@ aiobotocore = ">=1,<2"
 pydantic = ">=1,<2"
 aiomysql = "*"
 sqlalchemy = "*"
+slack_sdk = "*"
 
 [dev-packages]
 pytest = "*"
