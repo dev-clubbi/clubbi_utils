@@ -2,12 +2,11 @@ from typing import Tuple, Any, Generator
 
 import pytest
 
-from tests.json.fixtures import dumps_fixture, loads_to_compare
+from tests.json.json_test_data import example_data, loads_to_compare
 
 
 @pytest.fixture
 def json_fixture() -> Generator[Tuple[Any, Any], None, None]:
-
     from clubbi_utils import json
     from importlib import reload
     reload(json)
@@ -18,5 +17,5 @@ def json_fixture() -> Generator[Tuple[Any, Any], None, None]:
 
 def test_dumps_loads(json_fixture):
     loads, dumps = json_fixture
-    data = loads(dumps(dumps_fixture, pretty=True, sort_keys = True))
+    data = loads(dumps(example_data, pretty=True, sort_keys = True))
     assert loads_to_compare == data

@@ -3,7 +3,7 @@ from typing import Tuple, Any, Generator
 import pytest
 
 
-from tests.json.fixtures import dumps_fixture, loads_to_compare
+from tests.json.json_test_data import example_data, loads_to_compare
 
 
 @pytest.fixture
@@ -29,5 +29,5 @@ def json_fixture() -> Generator[Tuple[Any, Any], None, None]:
 
 def test_dumps_loads(json_fixture):
     loads, dumps = json_fixture
-    data = loads(dumps(dumps_fixture))
+    data = loads(dumps(example_data))
     assert loads_to_compare == data
