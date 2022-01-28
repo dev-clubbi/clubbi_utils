@@ -7,9 +7,11 @@ from tests.json.fixtures import dumps_fixture, loads_to_compare
 
 @pytest.fixture
 def json_fixture() -> Generator[Tuple[Any, Any], None, None]:
-    from clubbi_utils.json import loads, dumps
 
-    yield loads, dumps
+    from clubbi_utils import json
+    from importlib import reload
+    reload(json)
+    yield json.loads, json.dumps
 
 
 

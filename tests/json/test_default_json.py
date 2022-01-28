@@ -2,6 +2,7 @@ from typing import Tuple, Any, Generator
 
 import pytest
 
+
 from tests.json.fixtures import dumps_fixture, loads_to_compare
 
 
@@ -18,9 +19,11 @@ def json_fixture() -> Generator[Tuple[Any, Any], None, None]:
 
     builtins.__import__ = _import  # type: ignore
 
-    from clubbi_utils.json import loads, dumps
+    from clubbi_utils import json
+    from importlib import reload
+    reload(json)
 
-    yield loads, dumps
+    yield json.loads, json.dumps
     builtins.__import__ = real_import  # type: ignore
 
 
