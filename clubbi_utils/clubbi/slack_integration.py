@@ -1,14 +1,15 @@
-import os
 from slack_sdk.web.async_client import AsyncWebClient
-from slack_sdk.errors import SlackApiError
 
-client = AsyncWebClient(token=os.environ["SLACK_BOT_TOKEN"])
+from clubbi_utils.clubbi.async_messenger import AsyncSenderStr
 
 
-async def slack_it(channel_name: str, message: str) -> None:
-    try:
-        await client.chat_postMessage(channel=channel_name, text=message)
-    except SlackApiError as e:
-        assert e.response["ok"] is False
-        assert e.response["error"]
-        print(f"Got an error: {e.response['error']}")
+class SlackMessenger(AsyncSenderStr):
+    def __init__(self, token: str, channel_name: str):
+        self._client = AsyncWebClient(token=token)
+        self._chanel_name = channel_name
+
+    async def send(self, message: str) -> None:
+        await self._client.chat_postMessage(
+            channel=self._chanel_name,
+            text=message,
+        )
