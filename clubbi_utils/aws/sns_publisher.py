@@ -7,6 +7,12 @@ from clubbi_utils.json import dumps
 from clubbi_utils.logger import logger
 
 
+#docs: https://aws.amazon.com/sns/faqs/
+MAXIMUM_MESSAGE_LENGTH = 256_000
+
+class MaximumMessageLengthError(RuntimeError):
+    pass
+
 E = TypeVar("E")
 class SNSPublisher(Generic[E]):
     def __init__(self, client: AioBaseClient, topic_arn: str):
@@ -15,6 +21,9 @@ class SNSPublisher(Generic[E]):
 
     async def publish(self, message: E, attributes:  Optional[Dict[str, str]] = None, message_group_id: Optional[str] = None) -> None:
         json_body = dumps(message)
+        if len(json_body) > MAXIMUM_MESSAGE_LENGTH:
+            err_msg = f"The following message is larger than the maximum message size({MAXIMUM_MESSAGE_LENGTH}): '{json_body}'"
+            raise MaximumMessageLengthError(err_msg)
         message_attributes = {}
         if attributes:
             message_attributes = {

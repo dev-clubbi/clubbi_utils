@@ -3,8 +3,9 @@ from uuid import uuid4
 
 import aiobotocore
 
-from clubbi_utils.aws.sns_publisher import SNSPublisher
+from clubbi_utils.aws.sns_publisher import MAXIMUM_MESSAGE_LENGTH, MaximumMessageLengthError, SNSPublisher
 from tests.aws.localstack_targets import create_test_client
+from clubbi_utils import json
 
 
 class TestSnsPublisher(IsolatedAsyncioTestCase):
@@ -24,3 +25,13 @@ class TestSnsPublisher(IsolatedAsyncioTestCase):
             await publisher.publish({
                 "teste": 2
             }, dict(a='a'))
+    
+    async def test_error_on_big_message(self):
+        async with create_test_client(self._session, 'sns') as sns_client:
+            publisher = SNSPublisher(sns_client, self.topic_arn)
+            payload = {"teste": "a"*MAXIMUM_MESSAGE_LENGTH}
+            with self.assertRaises(MaximumMessageLengthError) as e:
+                await publisher.publish(payload, dict(a='a'))
+            
+            self.assertTrue(json.dumps(payload) in str(e.exception))
+
