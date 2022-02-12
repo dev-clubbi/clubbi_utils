@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any,cast
 from unittest import IsolatedAsyncioTestCase
 from aiobotocore.client import AioBaseClient
 from unittest.mock import MagicMock, AsyncMock
@@ -8,8 +8,9 @@ from clubbi_utils import json
 
 from clubbi_utils.aws.lambda_invoker import (
     AwsLambdaInvoker,
+    InvalidInputType,
     LambdaRaisedAnExceptionError,
-    LambdaFailedToParseOutputError,
+    FailedToParseOutputError,
 )
 
 
@@ -36,9 +37,11 @@ class _Output(BaseModel):
 class TestLambdaInvoker(IsolatedAsyncioTestCase):
     async def test_successfull_invocation(self):
         expected_output = _Output(ans=2)
-        invoker = AwsLambdaInvoker[_Input, _Output](
+        invoker = AwsLambdaInvoker(
             aws_lambda_client := create_lambda_aiobotocore_mock(expected_output.json()),
             function_name := "cool_function",
+            input_type=_Input,
+            output_type=_Output,
         )
 
         output = await invoker(input := _Input(args=["oi", "hi"]))
@@ -59,9 +62,11 @@ class TestLambdaInvoker(IsolatedAsyncioTestCase):
         )
         err = LambdaRaisedAnExceptionError("cool_function", payload)
 
-        invoker = AwsLambdaInvoker[Any, Any](
+        invoker = AwsLambdaInvoker(
             aws_lambda_client=create_lambda_aiobotocore_mock(json.dumps(payload)),
             function_name="cool_function",
+            input_type=object,
+            output_type=object,
         )
 
         with self.assertRaises(LambdaRaisedAnExceptionError) as e:
@@ -69,19 +74,33 @@ class TestLambdaInvoker(IsolatedAsyncioTestCase):
 
         self.assertEqual(err, e.exception)
 
-    async def test_lambda_resturning_invalid_payoload(self):
+    async def test_lambda_returning_invalid_payload(self):
         output = dict(a=2, b=["1", "2"])
-        invoker = AwsLambdaInvoker[Any, _Output](
+        invoker = AwsLambdaInvoker(
             aws_lambda_client=create_lambda_aiobotocore_mock(json.dumps(output)),
             function_name="cool_function",
+            input_type=object,
+            output_type=_Output,
         )
 
-        with self.assertRaises(LambdaFailedToParseOutputError) as e:
+        with self.assertRaises(FailedToParseOutputError) as e:
             a = await invoker("a")
 
         self.assertEqual(
             e.exception,
-            LambdaFailedToParseOutputError(
+            FailedToParseOutputError(
                 function_name="cool_function", output=output
             ),
         )
+    
+    async def test_invalid_input(self):
+        invoker = AwsLambdaInvoker(
+            aws_lambda_client=create_lambda_aiobotocore_mock(""),
+            function_name="cool_function",
+            input_type=_Input,
+            output_type=_Output,
+        )
+
+        with self.assertRaises(InvalidInputType) as e:
+            input_ = cast(Any, "nada")
+            await invoker(input_)
