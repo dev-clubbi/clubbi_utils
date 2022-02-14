@@ -4,7 +4,7 @@ from inspect import iscoroutinefunction, getframeinfo, getmembers
 from clubbi_utils.logger import logger
 
 
-def timeit(f):
+def with_timeit(f):
     meta = dict(
         qualname=f.__qualname__,
         __module__=f.__module__,
