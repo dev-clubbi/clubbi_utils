@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Callable, Optional
 from unittest import TestCase
 
-from clubbi_utils.operators import none_coalesce
+from clubbi_utils.operators import none_coalesce, none_assertion, ValueIsNoneError
 
 
 class TestOperators(TestCase):
@@ -21,4 +21,13 @@ class TestOperators(TestCase):
     def test_none_coalesce_with_default_none(self):
         ans = none_coalesce(None, None, None, default=None)
         self.assertIsNone(ans)
+    
+    def test_none_assertion(self):
+        f: Callable[[Optional[int]], int] = lambda v: none_assertion(v)+1
+        ans = f(1)
+        self.assertEqual(ans, 2)
+
+        with self.assertRaises(ValueIsNoneError):
+            f(None)
+        
 
