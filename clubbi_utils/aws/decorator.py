@@ -30,18 +30,21 @@ def with_aws_client(
 ) -> Callable:
     def wrap(f):
         async def wrapper(*args, **kwargs):
-            _settings = AioBotocoreSettings()
-            region_name = none_coalesce(region_name, default=_settings.boto_region_name)
-            max_retry_attempts = none_coalesce(max_retry_attempts, default=_settings.boto_max_retry_attempts)
-            read_timeout = none_coalesce(read_timeout, default=_settings.boto_read_timeout)
+            settings_kwargs = dict(
+                boto_region_name=region_name,
+                boto_read_timeout=read_timeout,
+                boto_max_retry_attempts=max_retry_attempts,
+            )
+            settings_kwargs_filtered = {k:v for k,v in settings_kwargs.items() if v is not None}
+            settings = AioBotocoreSettings(**settings_kwargs_filtered)
             
             session = _get_session()
             config = AioConfig(
-                read_timeout=read_timeout,
-                retries=dict(max_attempts=max_retry_attempts),
+                read_timeout=settings.boto_read_timeout,
+                retries=dict(max_attempts=settings.boto_max_retry_attempts),
             )
 
-            session_kwargs = dict(region_name=region_name) if region_name != None else {}
+            session_kwargs = dict(region_name=settings.boto_region_name) if settings.boto_region_name != None else {}
             async with session.create_client(name, config=config, **session_kwargs) as client:
                 return await f(client, *args, **kwargs)
 
