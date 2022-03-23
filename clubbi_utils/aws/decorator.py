@@ -8,19 +8,29 @@ from aiobotocore import AioSession
 from clubbi_utils.aws.local_mocks.s3_object_storage_local_mock import S3ObjectStorageLocalMock
 from clubbi_utils.aws.s3_object_storage import S3ObjectStorage
 from aiobotocore.client import AioBaseClient
+from aiobotocore.config import AioConfig
 
 @lru_cache
 def _get_session() -> AioSession:
     return aiobotocore.get_session()
 
 
-def with_aws_client(name: str, region_name: Optional[str] = None) -> Callable:
+def with_aws_client(
+    name: str,
+    region_name: Optional[str] = None,
+    read_timeout:int = 60,
+    max_retry_attempts:int = 5,
+) -> Callable:
     def wrap(f):
         async def wrapper(*args, **kwargs):
             session = _get_session()
+            config = AioConfig(
+                read_timeout=read_timeout,
+                retries=dict(max_attempts=max_retry_attempts),
+            )
 
             session_kwargs = dict(region_name=region_name) if region_name != None else {}
-            async with session.create_client(name, **session_kwargs) as client:
+            async with session.create_client(name, config=config, **session_kwargs) as client:
                 return await f(client, *args, **kwargs)
 
         return wrapper
