@@ -11,6 +11,7 @@ from aiobotocore.client import AioBaseClient
 from aiobotocore.config import AioConfig
 from pydantic import BaseSettings
 from functools import lru_cache
+from clubbi_utils.operators import none_coalesce
 
 
 @lru_cache
@@ -22,21 +23,19 @@ class AioBotocoreSettings(BaseSettings):
     boto_read_timeout: int = 60
     boto_max_retry_attempts: int = 5
 
-    @staticmethod
-    @lru_cache
-    def get_instance() -> "AioBotocoreSettings":
-        return AioBotocoreSettings()
-
-_boto_settings = AioBotocoreSettings.get_instance()
-
 def with_aws_client(
     name: str,
-    region_name: Optional[str] = _boto_settings.boto_region_name,
-    read_timeout:int = _boto_settings.boto_read_timeout,
-    max_retry_attempts:int = _boto_settings.boto_max_retry_attempts,
+    region_name: Optional[str]=None,
+    read_timeout:Optional[int]=None,
+    max_retry_attempts:Optional[int]=None,
 ) -> Callable:
     def wrap(f):
         async def wrapper(*args, **kwargs):
+            _settings = AioBotocoreSettings()
+            region_name = none_coalesce(region_name, default=_settings.boto_region_name)
+            max_retry_attempts = none_coalesce(max_retry_attempts, default=_settings.boto_max_retry_attempts)
+            read_timeout = none_coalesce(read_timeout, default=_settings.boto_read_timeout)
+            
             session = _get_session()
             config = AioConfig(
                 read_timeout=read_timeout,
