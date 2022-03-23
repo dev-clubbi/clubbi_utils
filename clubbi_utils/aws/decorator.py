@@ -10,7 +10,6 @@ from clubbi_utils.aws.s3_object_storage import S3ObjectStorage
 from aiobotocore.client import AioBaseClient
 from aiobotocore.config import AioConfig
 from pydantic import BaseSettings
-from functools import lru_cache
 from clubbi_utils.operators import none_coalesce
 
 
