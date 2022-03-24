@@ -1,4 +1,3 @@
-
 from sqlalchemy.dialects import mysql
 from sqlalchemy.sql import Selectable
 

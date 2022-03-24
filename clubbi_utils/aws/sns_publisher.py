@@ -22,8 +22,9 @@ class SNSPublisher:
         self.topic_arn = topic_arn
         self._client = client
 
-    async def publish(self, message: E, attributes: Optional[Dict[str, str]] = None,
-                      message_group_id: Optional[str] = None) -> None:
+    async def publish(
+        self, message: E, attributes: Optional[Dict[str, str]] = None, message_group_id: Optional[str] = None
+    ) -> None:
         json_body = dumps(message)
         if len(json_body) > MAXIMUM_MESSAGE_LENGTH:
             err_msg = f"The following message is larger than the maximum message size({MAXIMUM_MESSAGE_LENGTH}): '{json_body}'"
@@ -32,21 +33,14 @@ class SNSPublisher:
         if attributes:
             message_attributes = {
                 k: dict(
-                    DataType='String',
+                    DataType="String",
                     StringValue=v,
-                ) for k, v in attributes.items()
+                )
+                for k, v in attributes.items()
             }
 
-        publish_kwargs = dict(
-            TopicArn=self.topic_arn,
-            Message=json_body,
-            MessageAttributes=message_attributes
-        )
+        publish_kwargs = dict(TopicArn=self.topic_arn, Message=json_body, MessageAttributes=message_attributes)
         if message_group_id is not None:
             publish_kwargs["MessageGroupId"] = message_group_id
         response = await self._client.publish(**publish_kwargs)
-        logger.info(
-            {
-                'MessageId': response
-            }
-        )
+        logger.info({"MessageId": response})
