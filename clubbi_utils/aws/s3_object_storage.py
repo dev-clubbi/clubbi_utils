@@ -2,6 +2,7 @@ from asyncio import StreamReader
 from typing import Union, AsyncIterator, List, Any, Dict
 
 from aiobotocore.client import AioBaseClient
+from aiobotocore.response import StreamingBody
 
 _MIN_PART_SIZE = 5 * (1 << 20)
 
@@ -67,7 +68,7 @@ class S3ObjectStorage:
 
         response = await self._client.get_object(Bucket=self._bucket, Key=key)
         # this will ensure the connection is correctly re-used/closed
-        body_stream: StreamReader = response['Body']
+        body_stream: StreamingBody = response['Body']
 
         async with body_stream as stream:
             while chunk := await stream.read(chunk_length):

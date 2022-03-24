@@ -24,7 +24,7 @@ def json_fixture() -> Generator[Tuple[Any, Any], None, None]:
     reload(json)
 
     yield json.loads, json.dumps
-    builtins.__import__ = real_import  # type: ignore
+    builtins.__import__ = real_import
 
 
 def test_dumps_loads(json_fixture):
