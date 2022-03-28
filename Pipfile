@@ -21,6 +21,7 @@ pytz = "*"
 pytest-benchmark = "*"
 localstack = "*"
 awscli-local = "*"
+black = "*"
 
 [requires]
 python_version = "3.9"
