@@ -1,5 +1,5 @@
 from typing import AsyncIterator, List, Union
-from clubbi_utils.logger import logger
+from clubbi_utils.logging import logger
 
 from pathlib import Path
 import tempfile

@@ -3,7 +3,7 @@ from typing import Optional, Dict, TypeVar, Generic
 from aiobotocore.client import AioBaseClient
 
 from clubbi_utils.json import dumps
-from clubbi_utils.logger import logger
+from clubbi_utils.logging import logger
 
 # docs: https://aws.amazon.com/sns/faqs/
 MAXIMUM_MESSAGE_LENGTH = 256_000

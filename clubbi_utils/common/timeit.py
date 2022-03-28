@@ -1,7 +1,7 @@
 import time
 from inspect import iscoroutinefunction
 
-from clubbi_utils.logger import logger
+from clubbi_utils.logging import logger
 
 
 def with_timeit(f):
