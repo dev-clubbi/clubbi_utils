@@ -2,8 +2,11 @@ from typing import Any, Callable, Coroutine, TypeVar
 
 from clubbi_utils.mysql.mysql_connector import create_mysql_engine
 
-F = TypeVar('F', bound=Callable[..., Coroutine[Any, Any, Any]], )
-T = TypeVar('T')
+F = TypeVar(
+    "F",
+    bound=Callable[..., Coroutine[Any, Any, Any]],
+)
+T = TypeVar("T")
 
 
 def with_sql_engine(f: F) -> Callable[..., Coroutine[Any, Any, T]]:
