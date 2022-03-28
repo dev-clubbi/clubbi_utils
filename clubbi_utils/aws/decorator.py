@@ -17,16 +17,18 @@ from clubbi_utils.operators import none_coalesce
 def _get_session() -> AioSession:
     return aiobotocore.get_session()
 
+
 class AioBotocoreSettings(BaseSettings):
     boto_region_name: Optional[str] = None
     boto_read_timeout: int = 60
     boto_max_retry_attempts: int = 5
 
+
 def with_aws_client(
     name: str,
-    region_name: Optional[str]=None,
-    read_timeout:Optional[int]=None,
-    max_retry_attempts:Optional[int]=None,
+    region_name: Optional[str] = None,
+    read_timeout: Optional[int] = None,
+    max_retry_attempts: Optional[int] = None,
 ) -> Callable:
     def wrap(f):
         async def wrapper(*args, **kwargs):
@@ -35,9 +37,9 @@ def with_aws_client(
                 boto_read_timeout=read_timeout,
                 boto_max_retry_attempts=max_retry_attempts,
             )
-            settings_kwargs_filtered = {k:v for k,v in settings_kwargs.items() if v is not None}
+            settings_kwargs_filtered = {k: v for k, v in settings_kwargs.items() if v is not None}
             settings = AioBotocoreSettings(**settings_kwargs_filtered)
-            
+
             session = _get_session()
             config = AioConfig(
                 read_timeout=settings.boto_read_timeout,
@@ -51,6 +53,7 @@ def with_aws_client(
         return wrapper
 
     return wrap
+
 
 @lru_cache
 def _get_cached_local_mock(
@@ -83,15 +86,17 @@ def with_object_storage(
                 key_prefix=key_prefix,
             )
             return await f(object_storage, *args, **kwargs)
+
         return wrapper
-    
+
     def local_decorator(f: Callable) -> Callable:
         @wraps(f)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
             object_storage = _get_cached_local_mock(bucket_name, key_prefix)
             return await f(object_storage, *args, **kwargs)
+
         return wrapper
 
     if env in {"production", "staging"}:
-         return prod_staging_decorator
+        return prod_staging_decorator
     return local_decorator

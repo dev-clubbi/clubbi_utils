@@ -5,8 +5,8 @@ T = TypeVar("T")
 
 
 class AsyncSender(abc.ABC, Generic[T]):
-    @abc.abstractclassmethod
-    async def send(self, data: T):
+    @abc.abstractmethod
+    async def send(self, data: T) -> None:
         pass
 
 
