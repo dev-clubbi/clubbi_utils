@@ -1,4 +1,4 @@
-from typing import Callable, TypeVar, Coroutine, Any, Optional, AsyncContextManager, AsyncIterator
+from typing import Callable, Optional, AsyncContextManager, AsyncIterator
 
 from pydantic import BaseSettings
 from sqlalchemy.engine import URL
@@ -54,19 +54,28 @@ class SqlAlchemyConfig(BaseSettings):
         return engine
 
     async def init_engine(self) -> AsyncIterator[AsyncEngine]:
-        """ this method is meant to be used alongside frameworks such:
+        """ this method is meant to be used alongside sqllachemy-core sand frameworks such as:
             - aiohttp
             - FastAPI,
             - dependency-injector
         """
         engine = self.create_engine()
-        yield engine
-        await engine.dispose()
+        try:
+            yield engine
+        finally:
+            await engine.dispose()
 
     async def init_session_maker(self) -> AsyncIterator[SessionMaker]:
+        """ this method is meant to be used alongside sqlalchemy-orm and frameworks such as:
+                    - aiohttp
+                    - FastAPI,
+                    - dependency-injector
+                """
         engine = self.create_engine()
-        yield create_sqlalchemy_session_maker(engine=engine)
-        await engine.dispose()
+        try:
+            yield create_sqlalchemy_session_maker(engine=engine)
+        finally:
+            await engine.dispose()
 
     def with_engine(self, f: F) -> Callable[..., Coroutine[Any, Any, T]]:
         """Mostly useful along side lambda and sqlalchemy-core"""
@@ -82,7 +91,8 @@ class SqlAlchemyConfig(BaseSettings):
         return wrapper
 
     def with_session_maker(self, f: F) -> Callable[..., Coroutine[Any, Any, T]]:
-        """Mostly useful along side lambda and sqlalchemy-core"""
+        """Mostly useful along side lambda and sqlalchemy-orm"""
+
         async def wrapper(*args: Any, **kwargs: dict) -> Any:
             engine = self.create_engine()
             session_maker = create_sqlalchemy_session_maker(engine=engine)

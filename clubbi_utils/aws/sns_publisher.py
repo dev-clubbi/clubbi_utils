@@ -3,7 +3,6 @@ from typing import Optional, Dict, TypeVar, Generic
 from aiobotocore.client import AioBaseClient
 
 from clubbi_utils.json import dumps
-
 from clubbi_utils.logger import logger
 
 # docs: https://aws.amazon.com/sns/faqs/
@@ -17,7 +16,7 @@ class MaximumMessageLengthError(RuntimeError):
 E = TypeVar("E")
 
 
-class SNSPublisher:
+class SNSPublisher(Generic[E]):
     def __init__(self, client: AioBaseClient, topic_arn: str):
         self.topic_arn = topic_arn
         self._client = client
