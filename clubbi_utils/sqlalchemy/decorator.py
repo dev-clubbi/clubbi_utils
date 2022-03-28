@@ -2,8 +2,11 @@ from typing import TypeVar, Callable, Any, Coroutine
 
 from clubbi_utils.sqlalchemy.connector import SqlAlchemyConfig
 
-F = TypeVar('F', bound=Callable[..., Coroutine[Any, Any, Any]], )
-T = TypeVar('T')
+F = TypeVar(
+    "F",
+    bound=Callable[..., Coroutine[Any, Any, Any]],
+)
+T = TypeVar("T")
 
 
 def with_sqlalchemy_engine(f: F) -> Callable[..., Coroutine[Any, Any, T]]:
