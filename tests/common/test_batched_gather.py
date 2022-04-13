@@ -20,16 +20,16 @@ class TestBatchedGather(IsolatedAsyncioTestCase):
         return super().setUp()
 
     async def test_batched_gather(self):
-        output = await run_and_join_results(self._collection, 3)
+        output = await run_and_join_results(self._collection, len(self._collection) // 2)
         self.assertEqual(output, self._collection)
 
     async def test_batched_gather_speed(self):
         start = time.time()
-        await run_and_join_results(self._collection, 3)
-        time_took_three = time.time() - start
+        await run_and_join_results(self._collection, len(self._collection) // 2)
+        time_took_half = time.time() - start
 
         start = time.time()
-        await run_and_join_results(self._collection, 6)
-        time_took_six = time.time() - start
+        await run_and_join_results(self._collection, len(self._collection))
+        time_took_full = time.time() - start
 
-        self.assertTrue(time_took_three >= time_took_six)
+        self.assertTrue(time_took_half >= time_took_full)
