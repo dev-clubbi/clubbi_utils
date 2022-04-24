@@ -13,15 +13,15 @@ async def sleep_and_return(delay: Optional[float]) -> float:
     return delay
 
 
-async def run_and_join_results(collection: List[float], number_of_workesrs: int) -> List[float]:
-    return sum([b async for b in batched_gather(sleep_and_return, collection, number_of_workesrs)], [])
+async def run_and_join_results(collection: List[float], number_of_workers: int) -> List[float]:
+    return sum([b async for b in batched_gather(sleep_and_return, collection, number_of_workers)], [])
 
 
 async def run_and_join_results_with_exception(
     collection: List[Optional[float]],
-    number_of_workesrs: int,
+    number_of_workers: int,
 ) -> List[Union[float, Exception]]:
-    return sum([b async for b in batched_gather(sleep_and_return, collection, number_of_workesrs, True)], [])
+    return sum([b async for b in batched_gather(sleep_and_return, collection, number_of_workers, True)], [])
 
 
 class TestBatchedGather(IsolatedAsyncioTestCase):
