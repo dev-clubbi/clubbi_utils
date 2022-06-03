@@ -2,7 +2,7 @@ import pytest
 from io import StringIO
 import logging
 from clubbi_utils.json_logging import JsonLogger
-from clubbi_utils.common.dataclasses import dataclass
+from pydantic.dataclasses import dataclass
 from pydantic import BaseModel
 
 class ExampleBaseModel(BaseModel):
