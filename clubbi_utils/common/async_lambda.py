@@ -1,6 +1,5 @@
 import asyncio
-from collections import Coroutine
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, TypeVar, Coroutine
 
 from clubbi_utils.common.typing.lambda_context import LambdaContext
 
