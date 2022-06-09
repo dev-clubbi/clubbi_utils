@@ -1,4 +1,4 @@
-from typing import List, Any,cast
+from typing import List, Any, cast
 from unittest import IsolatedAsyncioTestCase
 from aiobotocore.client import AioBaseClient
 from unittest.mock import MagicMock, AsyncMock
@@ -88,11 +88,9 @@ class TestLambdaInvoker(IsolatedAsyncioTestCase):
 
         self.assertEqual(
             e.exception,
-            FailedToParseOutputError(
-                function_name="cool_function", output=output
-            ),
+            FailedToParseOutputError(function_name="cool_function", output=output),
         )
-    
+
     async def test_invalid_input(self):
         invoker = AwsLambdaInvoker(
             aws_lambda_client=create_lambda_aiobotocore_mock(""),
@@ -104,3 +102,21 @@ class TestLambdaInvoker(IsolatedAsyncioTestCase):
         with self.assertRaises(InvalidInputType) as e:
             input_ = cast(Any, "nada")
             await invoker(input_)
+
+    async def test_primitive_input_types(self):
+        expected_output = ["hello", "world"]
+        invoker = AwsLambdaInvoker(
+            aws_lambda_client := create_lambda_aiobotocore_mock(json.dumps(expected_output)),
+            function_name := "cool_function",
+            input_type=List[int],
+            output_type=List[str],
+        )
+
+        output = await invoker(input := [1, 2])
+
+        self.assertEqual(output, expected_output)
+
+        aws_lambda_client.invoke.assert_awaited_once_with(
+            FunctionName=function_name,
+            Payload=json.dumps(input).encode(),
+        )
