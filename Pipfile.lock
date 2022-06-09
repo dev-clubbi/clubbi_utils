@@ -415,11 +415,11 @@
         },
         "slack-sdk": {
             "hashes": [
-                "sha256:4427fc4495e8f7a559708114e23e177defb175dc8adc7a0502a5cd4487c01ba9",
-                "sha256:db9a98d9c75b6fa1cc927f2009dc974e6fde19a76b355d54a42fd21cd38ebd67"
+                "sha256:0816efc43d1d2db8286e8dbcbb2e86fd0f71c206c01c521c2cb054ecb40f9ced",
+                "sha256:860cd0e50c454b955f14321c8c5486a47cc1e0e84116acdb009107f836752feb"
             ],
             "index": "pypi",
-            "version": "==3.16.2"
+            "version": "==3.17.0"
         },
         "sqlalchemy": {
             "hashes": [
@@ -800,7 +800,7 @@
                 "sha256:0f7569a4a6ff151958b64304071d370daa3243d15941a7beedf0c9fe5105603e",
                 "sha256:a851e51367fb93e9e1361732c1d60dab63eff98712e503ea7d92e6eccb109b4f"
             ],
-            "markers": "python_version >= '3.6' and python_version < '4'",
+            "markers": "python_version >= '3.6' and python_version < '4.0'",
             "version": "==2.2.1"
         },
         "idna": {
@@ -1148,7 +1148,7 @@
                 "sha256:4c586de507202505346f3e32d1363eb9ed6932f0c2f63184dea88983ff4971e2",
                 "sha256:d2bbd99c320a2532ac71ff6a3164867884357da3e3301f0240090c5d2fdac7ec"
             ],
-            "markers": "python_version < '4' and python_full_version >= '3.6.3'",
+            "markers": "python_version < '4.0' and python_full_version >= '3.6.3'",
             "version": "==12.4.4"
         },
         "s3transfer": {
