@@ -1,12 +1,10 @@
 from asyncio import StreamReader
 from dataclasses import dataclass
-from typing import Dict, Generic, Any, Type, cast
+from typing import Dict, Generic, Any, Type
 from aiobotocore.client import AioBaseClient
 from clubbi_utils.async_callable import AsyncCallable, IN, OUT
-from pydantic import parse_obj_as
-from dataclasses import is_dataclass
+from pydantic import parse_obj_as, parse_raw_as
 from pydantic.error_wrappers import ValidationError
-from pydantic import BaseModel
 
 from clubbi_utils import json
 
@@ -23,10 +21,9 @@ class LambdaRaisedAnExceptionError(RuntimeError):
 @dataclass
 class InvalidInputType(ValueError):
     expected: Type
-    actual: Type
 
     def __str__(self) -> str:
-        return f"Invalid input type, expected: {self.expected}, actual: {self.actual}"
+        return f"Invalid input type, expected: {self.expected}"
 
 
 @dataclass
@@ -68,7 +65,7 @@ class AwsLambdaInvoker(AsyncCallable, Generic[IN, OUT]):
                 payload=payload,
             )
 
-    def __parse_decoded_body(self, decoded_body: Any) -> OUT:
+    def __parse_response_body(self, decoded_body: Any) -> OUT:
         try:
             return parse_obj_as(self._output_type, decoded_body)
         except ValidationError as e:
@@ -77,13 +74,19 @@ class AwsLambdaInvoker(AsyncCallable, Generic[IN, OUT]):
                 output=decoded_body,
             ) from e
 
+    def __check_input_type(self, payload_str: str) -> None:
+        try:
+            parse_raw_as(self._input_type, payload_str)
+        except ValidationError as e:
+            raise InvalidInputType(expected=self._input_type) from e
+    
     async def __call__(self, input_: IN) -> OUT:
-        if not isinstance(input_, self._input_type):
-            raise InvalidInputType(expected=self._input_type, actual=type(input_))
-        payload = json.dumps(input_).encode()
+        payload_str = json.dumps(input_)
+        self.__check_input_type(payload_str)
+        payload_bytes = payload_str.encode()
         lambda_response = await self._client.invoke(
             FunctionName=self._function_name,
-            Payload=payload,
+            Payload=payload_bytes,
         )
 
         payload_reader: StreamReader = lambda_response["Payload"]
@@ -92,6 +95,5 @@ class AwsLambdaInvoker(AsyncCallable, Generic[IN, OUT]):
 
         if isinstance(decoded_body, dict):
             self.__check_for_errors(decoded_body)
-        if issubclass(self._output_type, BaseModel) or is_dataclass(self._output_type):
-            return self.__parse_decoded_body(decoded_body)
-        return cast(OUT, decoded_body)
+        
+        return self.__parse_response_body(decoded_body)
