@@ -16,6 +16,8 @@ clubbi_sls_utils_deploy_lambda_layer <STAGE>
 * serverless 3.0
 
 ##### setup
+Make sure you have configured your aws credentials (usually it's already configured in the CI).
+
 You must have a a `lambda_layer.yml` file with your serverless lambda layer definition with this output in
 the resources section:
 ```yml
