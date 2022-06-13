@@ -1,12 +1,15 @@
 from pydantic import BaseModel
-from typing import Iterable, Type
+from typing import Iterable, Type, TypeVar
 from io import StringIO
 from csv import DictWriter
 
 
+T = TypeVar("T", bound=BaseModel)
+
+
 def base_model_collection_to_csv(
-    model_type: Type[BaseModel],
-    collection: Iterable[BaseModel],
+    model_type: Type[T],
+    collection: Iterable[T],
     delimiter: str = ",",
 ) -> str:
     """Converts a colection of BaseModels to a CSV string,
