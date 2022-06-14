@@ -56,9 +56,9 @@ def deploy_lambda_layer(stage: str, force: bool) -> None:
     print(f"{remote_revision=}")
 
     if local_revision == remote_revision:
-        print("Versions match, lets do nothing!")
+        print("Versions are the same, let's do nothing!")
         return
-    print("Versions doesn't match, lets deploy")
+    print("Versions are different, let's deploy!")
     deploy(stage, local_revision)
 
 
