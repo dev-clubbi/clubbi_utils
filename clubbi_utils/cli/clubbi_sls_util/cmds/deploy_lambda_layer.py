@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 
 from os import environ
-from subprocess import CalledProcessError, check_output, check_call
+from subprocess import CalledProcessError, SubprocessError, check_output, PIPE
 
 from argparse import ArgumentParser
-from typing import Optional
+from typing import Dict, Optional
 import hashlib
 from pathlib import Path
 
@@ -12,14 +12,41 @@ LAMBDA_LAYER_REVISION_KEY = "LambdaLayerRevision"
 LOCK_PATH = Path("Pipfile.lock")
 
 
+class OsCommandError(SubprocessError):
+    def __init__(self, error: CalledProcessError):
+        self._error = error
+
+    def __str__(self):
+        msgs = (
+            f"Command '{self._error.cmd}' exited with {self._error.returncode}",
+            "stdout:",
+            self._error.stdout.decode(),
+            "stderr:",
+            self._error.stderr.decode(),
+        )
+        return "\n".join(msgs)
+
+
+def run_os_cmd(cmd: str, env: Dict[str, str] = {}) -> str:
+    msg = f"runnning cmd: '{cmd}'"
+    if env:
+        envs_str = ";".join(f'{k}="{v}"' for k, v in env.items())
+        msg += f" with {envs_str}"
+    print(msg)
+
+    _env = environ.copy()
+    _env.update(env)
+
+    try:
+        return check_output(cmd, shell=True, stderr=PIPE, env=_env).decode()
+    except CalledProcessError as e:
+        raise OsCommandError(e)
+
+
+
 def get_remote_revision(stage: str) -> Optional[str]:
     cmd = f"npx sls info -s {stage} -c lambda_layer.yml --verbose"
-    try:
-        out_lines = check_output(cmd, shell=True).decode().split("\n")
-    except CalledProcessError as e:
-        print("Returned -1")
-        print(*e.output.decode().split("\n"), sep="\n")
-        return None
+    out_lines = run_os_cmd(cmd).splitlines()
 
     revision_line = next(
         (line for line in out_lines if LAMBDA_LAYER_REVISION_KEY in line),
@@ -37,11 +64,8 @@ def get_local_revision() -> str:
 
 
 def deploy(stage: str, local_revision: str) -> None:
-    env = environ.copy()
-    env["LOCK_HASH"] = local_revision
     cmd = f"npx sls deploy -c lambda_layer.yml -s {stage}"
-    print(f"runnning sls with '{cmd}' and LOCK_HASH={local_revision}")
-    check_call(cmd, shell=True, env=env)
+    run_os_cmd(cmd, env={"LOCK_HASH": local_revision})
 
 
 def deploy_lambda_layer(stage: str, force: bool) -> None:
