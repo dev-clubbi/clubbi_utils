@@ -14,6 +14,9 @@ class Undefined(object):
     def __deepcopy__(self, _):
         return self
 
+    def __hash__(self):
+        return hash(None) + 1
+
 
 UNDEFINED = Undefined()
 
