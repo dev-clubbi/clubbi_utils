@@ -5,18 +5,25 @@ import aiobotocore
 from clubbi_utils.aws.s3_object_storage import S3ObjectStorage
 from tests.aws.localstack_targets import create_test_client
 from aiobotocore.client import AioBaseClient
+import http.client
+from urllib.parse import urlparse
+
 
 BUCKET_NAME = "test-bucket"
 PREFIX = ""
 
 
 class TestS3ObjectStorage(IsolatedAsyncioTestCase):
-    
     async def _yield_s3_client(self) -> AsyncIterator[AioBaseClient]:
         async with create_test_client(self._session, "s3") as s3_client:
             yield s3_client
 
-    
+    def _get_request_http(self, url: str) -> bytes:
+        parsed_url = urlparse(url)
+        conn = http.client.HTTPConnection(f"{parsed_url.hostname}:{parsed_url.port}")
+        conn.request("GET", parsed_url.path)
+        return conn.getresponse().read()
+
     async def asyncSetUp(self) -> None:
         super().setUp()
         self._session = aiobotocore.get_session()
@@ -88,3 +95,8 @@ class TestS3ObjectStorage(IsolatedAsyncioTestCase):
         files = await self._storage.list_objects("folder")
 
         self.assertEqual(files, file_names)
+
+    async def test_create_presigned_url(self):
+        key = await self._storage.put_object("file.txt", b"hello world")
+        link = await self._storage.create_presigned_url(key, expiration=3600)
+        self.assertEqual(self._get_request_http(link), b"hello world")

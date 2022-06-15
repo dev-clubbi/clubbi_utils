@@ -83,6 +83,16 @@ class S3ObjectStorage:
         }
         await self._client.copy_object(Bucket=self._bucket, Key=self._build_key(destination), CopySource=copy_source)
 
+    async def create_presigned_url(self, key_name: str, expiration: int = 3600) -> str:
+        return await self._client.generate_presigned_url(
+            "get_object",
+            Params=dict(
+                Bucket=self._bucket,
+                Key=key_name,
+            ),
+            ExpiresIn=expiration,
+        )
+
 
 async def _group_chunks_to_min_part_size(in_iter: AsyncIterator[bytes]) -> AsyncIterator[bytes]:
     current_chunk: bytes = b""
