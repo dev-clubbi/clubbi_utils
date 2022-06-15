@@ -22,6 +22,7 @@ class TestS3ObjectStorage(IsolatedAsyncioTestCase):
         self._session = aiobotocore.get_session()
         self._s3_client_aiter = self._yield_s3_client()
         self._client = await self._s3_client_aiter.__anext__()
+        self._storage = S3ObjectStorage(self._client, BUCKET_NAME)
         await self._remove_objects()
 
     async def asyncTearDown(self) -> None:
@@ -41,9 +42,8 @@ class TestS3ObjectStorage(IsolatedAsyncioTestCase):
             await self._client.delete_objects(Bucket=BUCKET_NAME, Delete=delete_payload)
 
     async def test_put_get_small_file(self):
-        storage = S3ObjectStorage(self._client, BUCKET_NAME)
-        key = await storage.put_object("small_file.txt", b"hello world")
-        file = await storage.get_object("small_file.txt")
+        key = await self._storage.put_object("small_file.txt", b"hello world")
+        file = await self._storage.get_object("small_file.txt")
 
         self.assertEqual(key, "small_file.txt")
         self.assertEqual(file, b"hello world")
@@ -54,41 +54,37 @@ class TestS3ObjectStorage(IsolatedAsyncioTestCase):
             yield b"hello "
             yield b"world"
 
-        storage = S3ObjectStorage(self._client, BUCKET_NAME)
-        key = await storage.put_object("large_file.txt", byte_iterator())
-        file = await storage.get_object("large_file.txt")
+        key = await self._storage.put_object("large_file.txt", byte_iterator())
+        file = await self._storage.get_object("large_file.txt")
 
         self.assertEqual(key, "large_file.txt")
         self.assertEqual(file, b"large hello world")
 
     async def test_read_large_file(self):
-        storage = S3ObjectStorage(self._client, BUCKET_NAME)
-        key = await storage.put_object("read_large_file.txt", b"helloworld")
+        key = await self._storage.put_object("read_large_file.txt", b"helloworld")
         chunks = []
-        async for chunk in storage.stream_object("read_large_file.txt", chunk_length=3):
+        async for chunk in self._storage.stream_object("read_large_file.txt", chunk_length=3):
             chunks.append(chunk)
         self.assertEqual(key, "read_large_file.txt")
         self.assertEqual(chunks, [b"hel", b"low", b"orl", b"d"])
 
     async def test_copy_object(self):
-        storage = S3ObjectStorage(self._client, BUCKET_NAME)
-        await storage.put_object("file_to_be_copied.txt", data=b"to be copied")
-        await storage.copy_object("file_to_be_copied.txt", "file_copied.txt")
+        await self._storage.put_object("file_to_be_copied.txt", data=b"to be copied")
+        await self._storage.copy_object("file_to_be_copied.txt", "file_copied.txt")
 
-        file_to_be_copied = await storage.get_object("file_to_be_copied.txt")
-        file_copied = await storage.get_object("file_copied.txt")
+        file_to_be_copied = await self._storage.get_object("file_to_be_copied.txt")
+        file_copied = await self._storage.get_object("file_copied.txt")
 
         self.assertEqual(file_to_be_copied, b"to be copied")
         self.assertEqual(file_copied, file_to_be_copied)
 
     async def test_list_objects(self):
-        storage = S3ObjectStorage(self._client, BUCKET_NAME)
-        self.assertEqual(await storage.list_objects("folder"), [])
+        self.assertEqual(await self._storage.list_objects("folder"), [])
 
         file_names = [f"folder/file{i}.txt" for i in range(10)]
 
-        await asyncio.gather(*(storage.put_object(fname, data=b"content") for fname in file_names))
+        await asyncio.gather(*(self._storage.put_object(fname, data=b"content") for fname in file_names))
 
-        files = await storage.list_objects("folder")
+        files = await self._storage.list_objects("folder")
 
         self.assertEqual(files, file_names)
