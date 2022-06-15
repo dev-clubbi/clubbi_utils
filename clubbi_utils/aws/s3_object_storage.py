@@ -83,6 +83,25 @@ class S3ObjectStorage:
         }
         await self._client.copy_object(Bucket=self._bucket, Key=self._build_key(destination), CopySource=copy_source)
 
+    async def create_presigned_url(self, key_name: str, expiration: int = 3600) -> str:
+        """Create a temporary public download url for the given `key_name` and `expiration` in seconds.
+
+        Args:
+            key_name (str): Full path to the object in the bucket
+            expiration (int, optional): Url expiration time in seconds. Defaults to 3600.
+
+        Returns:
+            str: Download url to the object with the given expiration and key_name
+        """
+        return await self._client.generate_presigned_url(
+            "get_object",
+            Params=dict(
+                Bucket=self._bucket,
+                Key=key_name,
+            ),
+            ExpiresIn=expiration,
+        )
+
 
 async def _group_chunks_to_min_part_size(in_iter: AsyncIterator[bytes]) -> AsyncIterator[bytes]:
     current_chunk: bytes = b""
