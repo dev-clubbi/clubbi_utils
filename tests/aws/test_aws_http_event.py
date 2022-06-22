@@ -4,13 +4,13 @@ from unittest import IsolatedAsyncioTestCase
 
 from clubbi_utils.aws.aws_http_event import AwsHttpEvent
 
-STATIC_DIR = Path(__file__).parent
+PARENT_DIR = Path(__file__).parent
 
 
 class TestAwsHttpEvent(IsolatedAsyncioTestCase):
     def setUp(self) -> None:
         super().setUp()
-        with STATIC_DIR.joinpath("local_mocks/static/aws_http_payload_v2.json").open() as jsonfile:
+        with PARENT_DIR.joinpath("local_mocks/static/aws_http_payload_v2.json").open() as jsonfile:
             data = json.load(jsonfile)
 
         self.payload = data
