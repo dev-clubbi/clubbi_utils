@@ -10,7 +10,7 @@ PARENT_DIR = Path(__file__).parent
 class TestAwsHttpEvent(IsolatedAsyncioTestCase):
     def setUp(self) -> None:
         super().setUp()
-    data = json.loads(PARENT_DIR.joinpath("local_mocks/static/aws_http_payload_v2.json").read_text())
+        data = json.loads(PARENT_DIR.joinpath("local_mocks/static/aws_http_payload_v2.json").read_text())
 
         self.payload = data
         self.event: AwsHttpEvent = data
