@@ -1,0 +1,14 @@
+{
+  "headers": {
+    "header1": "value1",
+    "header2": "value1,value2"
+  },
+  "queryStringParameters": {
+    "parameter1": "value1,value2",
+    "parameter2": "value"
+  },
+  "body": "Hello from Lambda",
+  "pathParameters": {
+    "parameter1": "value1"
+  }
+}
