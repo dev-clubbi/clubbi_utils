@@ -14,13 +14,18 @@ class TestAwsHttpEvent(IsolatedAsyncioTestCase):
             data = json.load(jsonfile)
 
         self.payload = data
+        self.event: AwsHttpEvent = data
 
     def test_parse_aws_http_event(self):
-        event: AwsHttpEvent = self.payload
-
-        assert event == AwsHttpEvent(
+        assert self.event == AwsHttpEvent(
             body="Hello from Lambda",
             headers={"header1": "value1", "header2": "value1,value2"},
             queryStringParameters={"parameter1": "value1,value2", "parameter2": "value"},
             pathParameters={"parameter1": "value1"}
         )
+
+    def test_get_path_parameters(self):
+        path_params = self.event.get("pathParameters")
+
+        assert path_params
+        assert path_params.get("parameter1") == self.payload['pathParameters']['parameter1']
