@@ -1,4 +1,4 @@
-from typing import TypeVar, Callable, Awaitable, Any
+from typing import TypeVar, Callable, Awaitable, Any, Optional
 
 from pydantic import BaseSettings
 
@@ -15,10 +15,11 @@ class SlackMessenger(AsyncSenderStr):
         self._client = AsyncWebClient(token=token)
         self._channel_name = channel_name
 
-    async def send(self, message: str) -> None:
+    async def send(self, message: str, mrkdwn: Optional[bool] = None) -> None:
         await self._client.chat_postMessage(
             channel=self._channel_name,
             text=message,
+            mrkdwn=mrkdwn
         )
 
 
