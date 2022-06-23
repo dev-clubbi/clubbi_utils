@@ -1,4 +1,4 @@
-from typing import TypeVar, Callable, Awaitable, Any
+from typing import TypeVar, Callable, Awaitable, Any, Optional
 
 from pydantic import BaseSettings
 
@@ -20,6 +20,14 @@ class SlackMessenger(AsyncSenderStr):
             channel=self._channel_name,
             text=message,
         )
+
+    async def send_message_as_file(self, content: str, file_name: Optional[str], title: Optional[str],
+                                   message: Optional[str]) -> None:
+        await self._client.files_upload(channel=self._channel_name,
+                                        content=content,
+                                        filename=file_name,
+                                        title=title,
+                                        initial_comment=message)
 
 
 class SlackSettings(BaseSettings):
