@@ -23,7 +23,7 @@ class SlackMessenger(AsyncSenderStr):
 
     async def send_message_as_file(self, content: str, file_name: Optional[str], title: Optional[str],
                                    message: Optional[str]) -> None:
-        await self._client.files_upload(channel=self._channel_name,
+        await self._client.files_upload(channels=self._channel_name,
                                         content=content,
                                         filename=file_name,
                                         title=title,
