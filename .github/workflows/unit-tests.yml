@@ -37,9 +37,12 @@ jobs:
         run: |
           pipenv install --dev
 
-      - name: Docker
+      - name: Docker pull
+        run: docker-compose pull
+      
+      - name: Docker compose up
         run: |
-          docker-compose up -d localstack
+          docker-compose up --build -d localstack
           sleep 10
       
       - name: Run Unit Tests
