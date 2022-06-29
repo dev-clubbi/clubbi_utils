@@ -24,29 +24,40 @@ class AioBotocoreSettings(BaseSettings):
     boto_max_retry_attempts: int = 5
 
 
+def build_aws_config(region_name: Optional[str] = None,
+                     read_timeout: Optional[int] = None,
+                     max_retry_attempts: Optional[int] = None, ) -> tuple[AioConfig, dict]:
+    settings_kwargs = dict(
+        boto_region_name=region_name,
+        boto_read_timeout=read_timeout,
+        boto_max_retry_attempts=max_retry_attempts,
+    )
+    settings_kwargs_filtered = {k: v for k, v in settings_kwargs.items() if v is not None}
+    settings = AioBotocoreSettings(**settings_kwargs_filtered)
+    config = AioConfig(
+        read_timeout=settings.boto_read_timeout,
+        retries=dict(max_attempts=settings.boto_max_retry_attempts),
+    )
+    session_kwargs = dict(
+        region_name=settings.boto_region_name) if settings.boto_region_name is not None else {}
+    return config, session_kwargs
+
+
 def with_aws_client(
-    name: str,
-    region_name: Optional[str] = None,
-    read_timeout: Optional[int] = None,
-    max_retry_attempts: Optional[int] = None,
+        name: str,
+        region_name: Optional[str] = None,
+        read_timeout: Optional[int] = None,
+        max_retry_attempts: Optional[int] = None,
+
 ) -> Callable:
     def wrap(f):
         async def wrapper(*args, **kwargs):
-            settings_kwargs = dict(
-                boto_region_name=region_name,
-                boto_read_timeout=read_timeout,
-                boto_max_retry_attempts=max_retry_attempts,
-            )
-            settings_kwargs_filtered = {k: v for k, v in settings_kwargs.items() if v is not None}
-            settings = AioBotocoreSettings(**settings_kwargs_filtered)
-
             session = _get_session()
-            config = AioConfig(
-                read_timeout=settings.boto_read_timeout,
-                retries=dict(max_attempts=settings.boto_max_retry_attempts),
+            config, session_kwargs = build_aws_config(
+                region_name,
+                read_timeout,
+                max_retry_attempts,
             )
-
-            session_kwargs = dict(region_name=settings.boto_region_name) if settings.boto_region_name != None else {}
             async with session.create_client(name, config=config, **session_kwargs) as client:
                 return await f(client, *args, **kwargs)
 
@@ -57,8 +68,8 @@ def with_aws_client(
 
 @lru_cache
 def _get_cached_local_mock(
-    bucket_name: str,
-    key_prefix: str,
+        bucket_name: str,
+        key_prefix: str,
 ) -> S3ObjectStorageLocalMock:
     return S3ObjectStorageLocalMock(
         name=bucket_name,
@@ -67,10 +78,10 @@ def _get_cached_local_mock(
 
 
 def with_object_storage(
-    bucket_name: str,
-    key_prefix: str = "",
-    region_name: str = "us-east-1",
-    env: str = None,
+        bucket_name: str,
+        key_prefix: str = "",
+        region_name: str = "us-east-1",
+        env: str = None,
 ) -> Callable:
     """Injects a positional parameter which is a S3ObjectStorage if env is staging or production
     otherwise returns a cached S3ObjectStorageLocalMock."""
