@@ -39,7 +39,7 @@ jobs:
 
       - name: Docker
         run: |
-          docker-compose up -d localstack
+          docker-compose up -d localstack postgres
           sleep 10
       
       - name: Run Unit Tests
