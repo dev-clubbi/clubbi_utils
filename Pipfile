@@ -22,6 +22,7 @@ localstack = "*"
 awscli-local = "*"
 black = "*"
 types-pytz = "*"
+asyncpg = "*"
 
 [requires]
 python_version = "3.9"

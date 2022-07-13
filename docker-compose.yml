@@ -12,3 +12,11 @@ services:
       - DEBUG=1
     volumes:
       - ./aws:/docker-entrypoint-initaws.d
+  postgres:
+    image: postgres:13
+    ports:
+      - "${POSTGRES_PORT-5432}:5432"
+    environment:
+      POSTGRES_USER: 'test'
+      POSTGRES_PASSWORD: 'test'
+      POSTGRES_DB: 'test'
