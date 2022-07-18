@@ -83,6 +83,10 @@ class S3ObjectStorage:
         }
         await self._client.copy_object(Bucket=self._bucket, Key=self._build_key(destination), CopySource=copy_source)
 
+    async def delete_object(self, name):
+        key = self._build_key(name)
+        await self._client.delete_object(Bucket=self._bucket, Key=key)
+
     async def create_presigned_url(self, key_name: str, expiration: int = 3600) -> str:
         """Create a temporary public download url for the given `key_name` and `expiration` in seconds.
 
