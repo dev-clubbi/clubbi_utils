@@ -14,7 +14,7 @@ class PostgresConfig(SqlAlchemyConfig):
 
 
 def create_postgres_session_maker(
-    *, engine: Optional[AsyncEngine], config: Optional[PostgresConfig] = None, expire_on_commit: bool = False
+    *, engine: Optional[AsyncEngine] = None, config: Optional[PostgresConfig] = None, expire_on_commit: bool = False
 ) -> SessionMaker:
     if engine is None and config is None:
         config = PostgresConfig()
