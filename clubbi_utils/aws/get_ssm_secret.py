@@ -45,7 +45,7 @@ async def get_ssm_secret(
     ```
 
     Args:
-        ssm_client (AioBaseClient): aiobotocore cliente
+        ssm_client (AioBaseClient): aiobotocore client
         secret_name (str): Secret key
         secret_type (Type, optional): Secret value output. Defaults to str.
 
