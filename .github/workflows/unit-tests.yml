@@ -42,5 +42,8 @@ jobs:
           docker-compose up -d localstack postgres
           sleep 10
       
+      - name: Run mypy
+        run: pipenv run mypy -p clubbi_utils -p tests
+      
       - name: Run Unit Tests
         run: PYTHONPATH=. pipenv run coverage run -m pytest
