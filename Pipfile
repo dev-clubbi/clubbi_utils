@@ -23,6 +23,7 @@ awscli-local = "*"
 black = "*"
 types-pytz = "*"
 asyncpg = "*"
+alembic = "*"
 
 [requires]
 python_version = "3.9"
