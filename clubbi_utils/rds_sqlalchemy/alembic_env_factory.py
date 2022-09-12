@@ -7,10 +7,7 @@ from typing import cast, Any, Optional
 
 from alembic import context
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 from alembic.config import Config
-from sqlalchemy.engine import URL
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import MetaData
 
@@ -34,11 +31,11 @@ async def get_sqlalchemy_url(config: Config) -> Optional[str]:
         rds_data = config.get_section(f'rds.{my_env}')
         assert rds_data
         pg_config = await load_rds_sqlalchemy_config(
-            rds_instance_id=rds_data['rds_datainstance_id'],
+            rds_instance_id=rds_data['instance_id'],
             database_name=rds_data['database_name'],
             user_name=rds_data['user_name'],
             password_secret_id=rds_data['password_secret_id'],
-            driver=driver,
+            driver_name=driver,
         )
         if sys.stdin.isatty():
             in_ = input(f"""\nAre changing [\033[1m{my_env}\033[0m] database?\nconfirm typing yes:""")
@@ -89,7 +86,7 @@ def run_alembic_env(target_metadata: MetaData) -> None:
         and associate a connection with the context.
 
         """
-        url = await get_sqlalchemy_url()
+        url = await get_sqlalchemy_url(config)
         if url is None:
             return
 

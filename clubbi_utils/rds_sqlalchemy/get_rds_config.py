@@ -19,7 +19,7 @@ async def load_rds_sqlalchemy_config(
     database_describe, password_data = await gather(
         rds.describe_db_instances(DBInstanceIdentifier=rds_instance_id),
         secretsmanager.get_secret_value(
-            password_secret_id,
+            SecretId=password_secret_id,
         ),
     )
 
