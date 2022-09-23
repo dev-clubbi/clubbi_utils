@@ -11,6 +11,9 @@ Command:
 clubbi_sls_utils_deploy_lambda_layer <STAGE>
 ```
 
+### Alembic helper:
+We have [here](clubbi_utils/rds_sqlalchemy/README.md) a simpler way of using alembic alongside simple databases 
+
 #### Pre requirements
 * node
 * serverless 3.0
