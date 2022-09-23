@@ -23,16 +23,16 @@ This is useful for running migrations agains `staging` and `production`
 
 ```ini
 [rds.production]
-instance_id = backend-postgres
-database_name = warehouse
-user_name = warehouse_dba
-password_secret_id = postgres/warehouse/dba_password
+instance_id = rds_instance_id
+database_name = database_name
+user_name = user_name
+password_secret_id = password_secrets_manager_id
 
 [rds.staging]
-instance_id = backend-postgres
-database_name = staging_warehouse
-user_name = staging_warehouse_dba
-password_secret_id = postgres/staging_warehouse/dba_password
+instance_id = stg_rds_instance_id
+database_name = stg_database_name
+user_name = stg_user_name
+password_secret_id = stg_password_secrets_manager_id
 ```
 
 *Note: A common mistake is quote values inside init files.* 
