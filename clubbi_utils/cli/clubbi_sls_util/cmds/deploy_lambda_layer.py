@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 from argparse import ArgumentParser
+import re
 from typing import Dict, Optional
 import hashlib
 from pathlib import Path
@@ -13,7 +14,13 @@ LOCK_PATH = Path("Pipfile.lock")
 
 async def get_remote_revision(stage: str) -> Optional[str]:
     cmd = f"npx sls info -s {stage} -c lambda_layer.yml --verbose"
-    out_lines = (await run_os_cmd(cmd, echo=False)).splitlines()
+    try:
+        cmd_out = await run_os_cmd(cmd, echo=False)
+    except RuntimeError as e:
+        if re.search(r"Stack with id .* does not exist", str(e)):
+            return None
+        raise e
+    out_lines = cmd_out.splitlines()
 
     revision_line = next(
         (line for line in out_lines if LAMBDA_LAYER_REVISION_KEY in line),
