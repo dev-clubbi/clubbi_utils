@@ -1,9 +1,9 @@
-from typing import TypeVar, Generic
+from typing import Protocol, TypeVar
 
-IN = TypeVar("IN")
-OUT = TypeVar("OUT")
+IN = TypeVar("IN", contravariant=True)
+OUT = TypeVar("OUT", covariant=True)
 
 
-class AsyncCallable(Generic[IN, OUT]):
+class AsyncCallable(Protocol[IN, OUT]):
     async def __call__(self, input_: IN) -> OUT:
-        pass
+        ...
