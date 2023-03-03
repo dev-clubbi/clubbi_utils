@@ -17,13 +17,15 @@ try:
         raise TypeError
 
     def dumps(
-        data: Any, /, pretty: bool = False, sort_keys: bool = False, default: Callable[[Any], Any] = _serialize_default
+        data: Any, /, pretty: bool = False, sort_keys: bool = False, non_str_keys: bool = True, default: Callable[[Any], Any] = _serialize_default
     ) -> str:
         option = 0
         if pretty:
             option |= OPT_INDENT_2
         if sort_keys:
             option |= OPT_SORT_KEYS
+        if non_str_keys:
+            option |= OPT_NON_STR_KEYS
 
         return _dumps(data, option=option, default=default).decode()
 
