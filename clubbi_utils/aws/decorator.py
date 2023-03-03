@@ -70,7 +70,7 @@ def with_object_storage(
     bucket_name: str,
     key_prefix: str = "",
     region_name: str = "us-east-1",
-    env: str = None,
+    env: Optional[str] = None,
 ) -> Callable:
     """Injects a positional parameter which is a S3ObjectStorage if env is staging or production
     otherwise returns a cached S3ObjectStorageLocalMock."""
