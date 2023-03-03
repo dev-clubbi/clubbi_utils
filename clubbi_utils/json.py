@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 try:
     import orjson
-    from orjson import dumps as _dumps, loads as _loads, OPT_INDENT_2, OPT_SORT_KEYS
+    from orjson import dumps as _dumps, loads as _loads, OPT_INDENT_2, OPT_SORT_KEYS, OPT_NON_STR_KEYS
     from decimal import Decimal
 
     def _serialize_default(obj: Any) -> Any:
