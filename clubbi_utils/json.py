@@ -1,4 +1,4 @@
-from typing import Union, Any, Callable
+from typing import Union, Any, Callable, Set
 
 from pydantic import BaseModel
 
@@ -12,6 +12,8 @@ try:
             return str(obj)
         if isinstance(obj, BaseModel):
             return obj.dict()
+        if isinstance(obj, Set):
+            return list(obj)
         raise TypeError
 
     def dumps(
