@@ -12,6 +12,8 @@ try:
             return str(obj)
         if isinstance(obj, BaseModel):
             return obj.dict()
+        if isinstance(obj, Set):
+            return list(obj)
         raise TypeError
 
     def dumps(
