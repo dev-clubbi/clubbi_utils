@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 aiobotocore = ">=1,<2"
 pydantic = ">=1.9.1,<2"
-sqlalchemy = ">=1.4,<1.5"
+sqlalchemy = ">=1.4,<2.1"
 slack_sdk = "*"
 
 [dev-packages]
