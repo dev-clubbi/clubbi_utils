@@ -43,7 +43,7 @@ except ImportError:
         return pydantic_encoder(obj)
 
     def dumps(
-        data: Any, /, pretty: bool = False, sort_keys: bool = False, default: Callable[[Any], Any] = _default
+        data: Any, /, pretty: bool = False, sort_keys: bool = False, non_str_keys: bool = True, default: Callable[[Any], Any] = _default
     ) -> str:
         return default_dumps(data, default=default, sort_keys=sort_keys, indent=2 if pretty else None)
 
