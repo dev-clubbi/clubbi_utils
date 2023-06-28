@@ -1,7 +1,9 @@
 name: 'PyPI publish'
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - "main"
 
 
 jobs:
