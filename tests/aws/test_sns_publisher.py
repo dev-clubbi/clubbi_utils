@@ -1,7 +1,7 @@
 from unittest import IsolatedAsyncioTestCase
 from uuid import uuid4
 
-import aiobotocore
+from aiobotocore.session import get_session
 
 from clubbi_utils import json
 from clubbi_utils.aws.sns_publisher import MAXIMUM_MESSAGE_LENGTH, MaximumMessageLengthError, SNSPublisher
@@ -12,7 +12,7 @@ class TestSnsPublisher(IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self) -> None:
         self.topic_name = str(uuid4())
-        self._session = aiobotocore.get_session()
+        self._session = get_session()
         async with create_test_client(self._session, 'sns') as sns_client:
             topic_data = await sns_client.create_topic(
                 Name=self.topic_name,

@@ -55,10 +55,8 @@ class S3ObjectStorage:
         response = await self._client.get_object(Bucket=self._bucket, Key=key)
         # this will ensure the connection is correctly re-used/closed
         body_stream: StreamingBody = response["Body"]
-
-        async with body_stream as stream:
-            while chunk := await stream.read(chunk_length):
-                yield chunk
+        async for chunk in body_stream.iter_chunks(chunk_length):
+            yield chunk
 
     async def get_object(self, key: str, full_key: bool = False) -> bytes:
         if full_key is False:
