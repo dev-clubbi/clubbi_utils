@@ -1,7 +1,6 @@
 from unittest import IsolatedAsyncioTestCase
 
-import aiobotocore
-
+from aiobotocore.session import get_session
 from clubbi_utils.aws.ses_mailer import SesMailer
 from clubbi_utils.mailer import Email, EmailAttachment
 from tests.aws.localstack_targets import create_test_client
@@ -10,7 +9,7 @@ from tests.aws.localstack_targets import create_test_client
 class TestSesMailer(IsolatedAsyncioTestCase):
     async def asyncSetUp(self) -> None:
         super().setUp()
-        self._session = aiobotocore.get_session()
+        self._session = get_session()
         async with create_test_client(self._session, 'ses') as ses:
             await ses.verify_domain_identity(Domain='test.io')
 

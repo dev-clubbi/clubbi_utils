@@ -4,25 +4,28 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aiobotocore = ">=1,<2"
-pydantic = ">=1.9.1,<2"
-sqlalchemy = ">=1.4,<1.5"
+aiobotocore = ">=2,<3"
+pydantic = ">=1.10.2,<2"
 slack_sdk = "*"
+sqlalchemy = ">=1.4,<1.5"
 
 [dev-packages]
-pytest = "*"
-coverage = "*"
-mypy = "*"
-pytest-cov = "*"
-orjson = ">=3.6.6,<4"
-types-orjson = "*"
-pytz = "*"
-pytest-benchmark = "*"
-localstack = "*"
+asyncpg = "*"
 awscli-local = "*"
 black = "*"
+coverage = "*"
+localstack = "*"
+mypy = ">=1.4.*"
+orjson = ">=3.9.1,<4"
+pytest = "*"
+pytest-benchmark = "*"
+pytest-cov = "*"
+pytz = "*"
+types-orjson = "*"
 types-pytz = "*"
-asyncpg = "*"
+autoflake="*"
+setuptools="*"
+build = "*"
 
 [requires]
 python_version = "3.9"
@@ -30,3 +33,4 @@ python_version = "3.9"
 [scripts]
 format-check = 'black --check --diff clubbi_utils'
 format = 'black clubbi_utils'
+build = 'python -m build'

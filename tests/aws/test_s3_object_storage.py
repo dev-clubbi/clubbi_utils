@@ -1,13 +1,12 @@
 from typing import AsyncIterator
 from unittest import IsolatedAsyncioTestCase
 import asyncio
-import aiobotocore
+from aiobotocore.session import get_session
 from clubbi_utils.aws.s3_object_storage import S3ObjectStorage
 from tests.aws.localstack_targets import create_test_client
 from aiobotocore.client import AioBaseClient
 import http.client
 from urllib.parse import urlparse
-
 
 BUCKET_NAME = "test-bucket"
 PREFIX = ""
@@ -26,14 +25,18 @@ class TestS3ObjectStorage(IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self) -> None:
         super().setUp()
-        self._session = aiobotocore.get_session()
+        self._session = get_session()
         self._s3_client_aiter = self._yield_s3_client()
         self._client = await self._s3_client_aiter.__anext__()
+        await self._client.create_bucket(
+            ACL='private',
+            Bucket=BUCKET_NAME, )
         self._storage = S3ObjectStorage(self._client, BUCKET_NAME)
         await self._remove_objects()
 
     async def asyncTearDown(self) -> None:
         await self._remove_objects()
+        await self._client.delete_bucket(Bucket=BUCKET_NAME)
         with self.assertRaises(StopAsyncIteration):
             await self._s3_client_aiter.__anext__()
         await super().asyncTearDown()

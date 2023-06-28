@@ -1,5 +1,4 @@
-from aiobotocore import AioSession
-from aiobotocore.session import ClientCreatorContext
+from aiobotocore.session import ClientCreatorContext, AioSession
 
 
 class LocalStack:
