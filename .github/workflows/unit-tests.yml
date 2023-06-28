@@ -1,4 +1,4 @@
-name: Run Unit Tests In Any Push
+name: 'Run Unit Testss'
 
 on:
   push:
