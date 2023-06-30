@@ -4,6 +4,7 @@ from typing import Optional, Any, Callable
 
 import aiobotocore
 from aiobotocore import AioSession
+from aiobotocore.session import get_session
 
 from clubbi_utils.aws.local_mocks.s3_object_storage_local_mock import S3ObjectStorageLocalMock
 from clubbi_utils.aws.s3_object_storage import S3ObjectStorage
@@ -15,7 +16,7 @@ from clubbi_utils.operators import none_coalesce
 
 @lru_cache
 def _get_session() -> AioSession:
-    return aiobotocore.get_session()
+    return get_session()
 
 
 class AioBotocoreSettings(BaseSettings):
