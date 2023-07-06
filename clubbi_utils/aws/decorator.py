@@ -2,16 +2,14 @@ from functools import lru_cache, wraps
 from os import getenv
 from typing import Optional, Any, Callable
 
-import aiobotocore
-from aiobotocore import AioSession
+from aiobotocore.client import AioBaseClient
+from aiobotocore.config import AioConfig
+from aiobotocore.session import AioSession
 from aiobotocore.session import get_session
+from pydantic import BaseSettings
 
 from clubbi_utils.aws.local_mocks.s3_object_storage_local_mock import S3ObjectStorageLocalMock
 from clubbi_utils.aws.s3_object_storage import S3ObjectStorage
-from aiobotocore.client import AioBaseClient
-from aiobotocore.config import AioConfig
-from pydantic import BaseSettings
-from clubbi_utils.operators import none_coalesce
 
 
 @lru_cache
