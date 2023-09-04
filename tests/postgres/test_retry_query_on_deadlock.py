@@ -11,7 +11,7 @@ from clubbi_utils.postgres.retry_query_on_deadlock import retry_query_on_deadloc
 
 class TestRetryQueryOnDeadlock(IsolatedAsyncioTestCase):
     async def asyncSetUp(self) -> None:
-        self._conn = AsyncMock(sepc=AsyncConnection)
+        self._conn = AsyncMock(spec=AsyncConnection)
         self._statement = MagicMock(spec=Executable)
         self._dbapi_error_deadlock = DBAPIError("", "", orig=MagicMock(pgcode="40P01"))
         self._dbapi_error_other_error = DBAPIError("", "", orig=MagicMock(pgcode="21000"))
@@ -40,7 +40,7 @@ class TestRetryQueryOnDeadlock(IsolatedAsyncioTestCase):
         self.assertEqual(e.exception, self._dbapi_error_deadlock)
         self._conn.execute.assert_has_awaits(call(self._statement) for _ in range(maximum_number_of_retries))
 
-    async def test_retry_on_deadlock_unknow_error(self) -> None:
+    async def test_retry_on_deadlock_unknown_error(self) -> None:
         self._conn.execute.side_effect = self._dbapi_error_other_error
         with self.assertRaises(DBAPIError) as e:
             await self._run(
@@ -49,7 +49,7 @@ class TestRetryQueryOnDeadlock(IsolatedAsyncioTestCase):
             )
         self.assertEqual(e.exception, self._dbapi_error_other_error)
 
-    async def test_retry_on_deadlock_unknow_error_after_tries(self) -> None:
+    async def test_retry_on_deadlock_unknown_error_after_tries(self) -> None:
         self._conn.execute.side_effect = [self._dbapi_error_deadlock for _ in range(5)] + [
             self._dbapi_error_other_error
         ]
