@@ -2,8 +2,7 @@ name: 'PyPI publish'
 
 on:
   release:
-    types:
-      - created
+    types: [published]
 
 
 jobs:
@@ -25,8 +24,8 @@ jobs:
       
       - name: Bump version
         run: |
-          NEW_VERSION=$(jq -r '.release.tag_name' $GITHUB_EVENT_PATH)
-          sed -i "s/version = .*/version = \"$NEW_VERSION\"/" setup.cfg
+          NEW_VERSION=${{ github.event.release.tag_name }}
+          sed -i "s/version = .*/version = $NEW_VERSION/" setup.cfg
           git commit -m "build(setup.cfg): bump version to $NEW_VERSION"
           git push
 
