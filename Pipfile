@@ -26,6 +26,7 @@ types-pytz = "*"
 autoflake="*"
 setuptools="*"
 build = "*"
+sqlalchemy = {version=">=1.4,<1.5", extras = ["asyncio", "mypy"]}
 
 [requires]
 python_version = "3.9"
