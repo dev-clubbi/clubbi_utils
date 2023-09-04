@@ -27,7 +27,7 @@ jobs:
         run: |
           NEW_VERSION=$(jq -r '.release.tag_name' $GITHUB_EVENT_PATH)
           sed -i "s/version = .*/version = \"$NEW_VERSION\"/" setup.cfg
-          git commit -m "Bump version to $NEW_VERSION" setup.cfg
+          git commit -m "build(setup.cfg): bump version to $NEW_VERSION"
           git push
 
       - id: install-pipenv
