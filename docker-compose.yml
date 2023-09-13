@@ -10,6 +10,7 @@ services:
       - DATA_DIR=/tmp/localstack/data
       - SERVICES=${SERVICES- }
       - DEBUG=1
+      - PROVIDER_OVERRIDE_S3=asf
     volumes:
       - ./aws:/docker-entrypoint-initaws.d
   postgres:

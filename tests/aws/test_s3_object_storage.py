@@ -1,7 +1,9 @@
+from datetime import datetime, timedelta
 from typing import AsyncIterator
 from unittest import IsolatedAsyncioTestCase
 import asyncio
 from aiobotocore.session import get_session
+from dateutil.tz import tzutc
 from clubbi_utils.aws.s3_object_storage import S3ObjectStorage
 from tests.aws.localstack_targets import create_test_client
 from aiobotocore.client import AioBaseClient
@@ -29,8 +31,9 @@ class TestS3ObjectStorage(IsolatedAsyncioTestCase):
         self._s3_client_aiter = self._yield_s3_client()
         self._client = await self._s3_client_aiter.__anext__()
         await self._client.create_bucket(
-            ACL='private',
-            Bucket=BUCKET_NAME, )
+            ACL="private",
+            Bucket=BUCKET_NAME,
+        )
         self._storage = S3ObjectStorage(self._client, BUCKET_NAME)
         await self._remove_objects()
 
@@ -103,3 +106,12 @@ class TestS3ObjectStorage(IsolatedAsyncioTestCase):
         key = await self._storage.put_object("file.txt", b"hello world")
         link = await self._storage.create_presigned_url(key, expiration=3600)
         self.assertEqual(self._get_request_http(link), b"hello world")
+
+    async def test_get_object_attribute(self) -> None:
+        now = datetime.utcnow().replace(tzinfo=tzutc())
+        key = await self._storage.put_object("file.txt", b"hello world")
+        info = await self._storage.get_object_attributes(key)
+        self.assertEqual(info.object_size, len(b"hello world"))
+        self.assertTrue(
+            now - timedelta(seconds=2) <= info.last_modified <= now + timedelta(seconds=2), (info.last_modified, now)
+        )
