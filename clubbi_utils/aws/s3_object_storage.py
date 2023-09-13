@@ -5,7 +5,6 @@ from typing import Union, AsyncIterator, List, Any, Dict
 from aiobotocore.client import AioBaseClient
 from aiobotocore.response import StreamingBody
 from pydantic import BaseModel
-from pydantic.utils import Obj
 
 _MIN_PART_SIZE = 5 * (1 << 20)
 
