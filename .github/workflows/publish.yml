@@ -13,6 +13,7 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/clubbi_utils
+      
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
       # Give the default GITHUB_TOKEN write permission to commit and push the
