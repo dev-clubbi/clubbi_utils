@@ -32,12 +32,11 @@ jobs:
         run: |
           NEW_VERSION=${{ github.event.release.tag_name }}
           sed -i "s/version = .*/version = $NEW_VERSION/" setup.cfg
-      
-      - name: Commit bump version
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "build(setup.cfg): bump version to ${{ github.event.release.tag_name }}"
-          file_pattern: setup.cfg
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add setup.cfg
+          git commit -m "build(setup.cfg): bump version to $NEW_VERSION"
+          git push
 
       - id: install-pipenv
         run: |
