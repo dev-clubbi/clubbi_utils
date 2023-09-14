@@ -1,7 +1,7 @@
 import traceback
-from typing import Any
+from typing import Any, Optional
 from sqlalchemy.engine import Result
-from sqlalchemy.ext.asyncio import AsyncConnection
+from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.sql import Executable
 from clubbi_utils.json_logging import jlogger
@@ -15,24 +15,26 @@ def is_deadlock_error(dbapie: DBAPIError) -> bool:
 
 
 async def retry_query_on_deadlock(
-    conn: AsyncConnection,
+    engine: AsyncEngine,
     statement: Executable,
+    parameters: Optional[Any] = None,
     maximum_number_of_retries: int = 10,
 ) -> Result:
     error: Exception
     for attempt in range(maximum_number_of_retries):
-        try:
-            return await conn.execute(statement)
-        except DBAPIError as dbapie:
-            if not is_deadlock_error(dbapie):
-                raise
-            jlogger.warning(
-                "retry_query_on_deadlock",
-                "deadlock_error",
-                str_err=str(dbapie),
-                repr_err=repr(dbapie),
-                traceback=traceback.format_exc(),
-                attempt=attempt + 1,
-            )
-            error = dbapie
+        async with engine.begin() as conn:
+            try:
+                return await conn.execute(statement, parameters)
+            except DBAPIError as dbapie:
+                if not is_deadlock_error(dbapie):
+                    raise
+                jlogger.warning(
+                    "retry_query_on_deadlock",
+                    "deadlock_error",
+                    str_err=str(dbapie),
+                    repr_err=repr(dbapie),
+                    traceback=traceback.format_exc(),
+                    attempt=attempt + 1,
+                )
+                error = dbapie
     raise error
