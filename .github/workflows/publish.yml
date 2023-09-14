@@ -20,14 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.event.release.target_commitish }}
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
-          cache: 'pipenv'
-      
       - name: Bump version
         run: |
           NEW_VERSION=${{ github.event.release.tag_name }}
@@ -37,6 +31,12 @@ jobs:
           git add setup.cfg
           git commit -m "build(setup.cfg): bump version to $NEW_VERSION"
           git push
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: 'pipenv'
 
       - id: install-pipenv
         run: |
