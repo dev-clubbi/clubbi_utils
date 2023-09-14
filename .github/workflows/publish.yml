@@ -26,8 +26,8 @@ jobs:
         run: |
           NEW_VERSION=${{ github.event.release.tag_name }}
           sed -i "s/version = .*/version = $NEW_VERSION/" setup.cfg
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add setup.cfg
           git commit -m "build(setup.cfg): bump version to $NEW_VERSION"
           git push
