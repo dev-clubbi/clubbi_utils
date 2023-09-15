@@ -1,10 +1,17 @@
 from asyncio import StreamReader
+from datetime import datetime
 from typing import Union, AsyncIterator, List, Any, Dict
 
 from aiobotocore.client import AioBaseClient
 from aiobotocore.response import StreamingBody
+from pydantic import BaseModel
 
 _MIN_PART_SIZE = 5 * (1 << 20)
+
+
+class ObjectAttributes(BaseModel):
+    last_modified: datetime
+    object_size: int
 
 
 class S3ObjectStorage:
@@ -65,6 +72,19 @@ class S3ObjectStorage:
         # this will ensure the connection is correctly re-used/closed
         async with response["Body"] as stream:
             return await stream.read()
+
+    async def get_object_attributes(self, key: str, full_key: bool = False) -> ObjectAttributes:
+        if full_key is False:
+            key = self._build_key(key)
+        response = await self._client.get_object_attributes(
+            Bucket=self._bucket,
+            Key=key,
+            ObjectAttributes=["LastModified", "ObjectSize"],
+        )
+        return ObjectAttributes(
+            last_modified=response["LastModified"],
+            object_size=response["ObjectSize"],
+        )
 
     async def list_objects(self, prefix: str = "") -> List[str]:
         objects = []
