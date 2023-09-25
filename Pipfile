@@ -7,7 +7,7 @@ name = "pypi"
 aiobotocore = ">=2,<3"
 pydantic = ">=1.10.2,<2"
 slack_sdk = "*"
-sqlalchemy = ">=1.4,<1.5"
+sqlalchemy = ">=1.4,<2.1"
 
 [dev-packages]
 asyncpg = "*"
@@ -26,7 +26,7 @@ types-pytz = "*"
 autoflake="*"
 setuptools="*"
 build = "*"
-sqlalchemy = {version=">=1.4,<1.5", extras = ["asyncio", "mypy"]}
+sqlalchemy = {version=">=1.4,<2.1", extras = ["asyncio", "mypy"]}
 types-python-dateutil = "*"
 
 [requires]
