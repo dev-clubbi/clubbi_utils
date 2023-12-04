@@ -1,6 +1,6 @@
 import time
 from inspect import iscoroutinefunction
-from typing import Callable
+from typing import Callable, TypeVar, cast
 from clubbi_utils.json_logging import jlogger
 
 
@@ -12,7 +12,10 @@ def _log(f: Callable, begin: float, end: float) -> None:
     jlogger.info(f.__name__, "time_elapsed", duration=end - begin, meta=meta)
 
 
-def with_timeit(f: Callable) -> Callable:
+FUNCTION_TYPE = TypeVar("FUNCTION_TYPE", bound=Callable)
+
+
+def with_timeit(f: FUNCTION_TYPE) -> FUNCTION_TYPE:
     def wrapper(*args, **kwargs):
         begin = time.time()
         r = f(*args, **kwargs)
@@ -28,6 +31,6 @@ def with_timeit(f: Callable) -> Callable:
         return r
 
     if iscoroutinefunction(f):
-        return async_wrapper
+        return cast(FUNCTION_TYPE, async_wrapper)
     else:
-        return wrapper
+        return cast(FUNCTION_TYPE, wrapper)
