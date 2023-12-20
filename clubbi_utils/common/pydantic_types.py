@@ -13,8 +13,7 @@ class BrDate(date):
             return value
         if isinstance(value, str):
             return datetime.strptime(value, "%d/%m/%Y").date()
-        else:
-            raise ValueError(f"Unrecognized type {value}")
+        raise ValueError(f"Unrecognized type {value}")
 
 
 BrCompatibleDate = Union[BrDate, date]
