@@ -22,7 +22,7 @@ class TestPydanticTypes(TestCase):
         self.assertEqual(foo, Foo(date1=date(2022, 12, 20), date2=None))
 
         with self.assertRaises(ValidationError):
-            foo = Foo.parse_obj(
+            Foo.parse_obj(
                 {
                     "date1": "2022/12/20",
                     "date2": None,
@@ -46,7 +46,7 @@ class TestPydanticTypes(TestCase):
         self.assertEqual(foo, Foo(date1=date(2022, 12, 20), date2=date(2022, 12, 20), date3=None))
 
         with self.assertRaises(ValidationError):
-            foo = Foo.parse_obj(
+            Foo.parse_obj(
                 {
                     "date1": "2022/12/20",
                     "date2": "2022-12-20",
