@@ -1,10 +1,10 @@
 from datetime import date, datetime
-from typing import Any, Callable, Union
+from typing import Any, Callable, Generator, Union
 
 
 class BrDate(date):
     @classmethod
-    def __get_validators__(cls) -> Callable[[Any], date]:
+    def __get_validators__(cls) -> Generator[Callable[[Any], date], None, None]:
         yield cls._validate
 
     @classmethod
