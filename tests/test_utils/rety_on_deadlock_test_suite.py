@@ -1,10 +1,11 @@
-from typing import Any, Optional, Protocol
+from typing import Any, Iterable, Optional, Protocol
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import AsyncMock, MagicMock, call
 from sqlalchemy.engine import Result
 
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine
 from sqlalchemy.sql import Executable
+from functools import partial
 
 
 class AsyncContextManagerMock:
@@ -30,6 +31,23 @@ class RetryQueryOnDeadlockCallable(Protocol):
         ...
 
 
+def attach_retry_on_deadlock_test_suite(
+    test_case_type: type[IsolatedAsyncioTestCase],
+    retry_query_on_deadlock: RetryQueryOnDeadlockCallable,
+    expected_error_type: type[Exception],
+    example_deadlock_error: Exception,
+    example_non_deadlock_error: Exception,
+) -> None:
+    for test_method_name in RetryOnDeadlockTestsSuite._all_test_methods():
+        test_suite = RetryOnDeadlockTestsSuite(
+            retry_query_on_deadlock=retry_query_on_deadlock,
+            expected_error_type=expected_error_type,
+            example_deadlock_error=example_deadlock_error,
+            example_non_deadlock_error=example_non_deadlock_error,
+        )
+        test_suite._attach_to_test_case(test_case_type, test_method_name)
+
+
 class RetryOnDeadlockTestsSuite:
     def __init__(
         self,
@@ -48,11 +66,16 @@ class RetryOnDeadlockTestsSuite:
         self._retry_query_on_deadlock = retry_query_on_deadlock
         self._expected_error_type = expected_error_type
 
-    def setup(self, test_case_type: type[IsolatedAsyncioTestCase]) -> None:
-        for attr in dir(self):
+    @classmethod
+    def _all_test_methods(cls) -> Iterable[str]:
+        for attr in dir(cls):
             if not attr.startswith("test"):
                 continue
-            setattr(test_case_type, attr, lambda test_case: getattr(self, attr)(test_case))
+            yield attr
+
+    def _attach_to_test_case(self, test_case_type: type[IsolatedAsyncioTestCase], attr: str) -> None:
+        test_method = getattr(self, attr)
+        setattr(test_case_type, attr, lambda test_case: test_method(test_case))
 
     async def _run(
         self,
