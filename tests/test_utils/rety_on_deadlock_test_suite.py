@@ -15,7 +15,8 @@ class AsyncContextManagerMock:
         return self._aenter_return
 
     async def __aexit__(self, *args: Any) -> None:
-        pass
+        """Async exit not needed, but need to be declared"""
+        ...
 
 
 class RetryQueryOnDeadlockCallable(Protocol):
@@ -51,8 +52,7 @@ class RetryOnDeadlockTestsSuite:
         for attr in dir(self):
             if not attr.startswith("test"):
                 continue
-            test_method = getattr(self, attr)
-            setattr(test_case_type, attr, lambda test_case: test_method(test_case))
+            setattr(test_case_type, attr, lambda test_case: getattr(self, attr)(test_case))
 
     async def _run(
         self,
