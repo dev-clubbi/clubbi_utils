@@ -19,12 +19,12 @@ SECRET_TYPE = TypeVar("SECRET_TYPE")
 
 @overload
 async def get_ssm_secret(ssm_client: AioBaseClient, secret_name: str, secret_type: Type[SECRET_TYPE]) -> SECRET_TYPE:
-    pass
+    ...
 
 
 @overload
 async def get_ssm_secret(ssm_client: AioBaseClient, secret_name: str, secret_type: Type = str) -> str:
-    pass
+    ...
 
 
 async def get_ssm_secret(

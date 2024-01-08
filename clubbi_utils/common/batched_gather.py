@@ -13,7 +13,7 @@ def batched_gather(
     number_of_workers: int,
     return_exceptions: Literal[True],
 ) -> AsyncIterator[List[Union[Exception, OUTPUT]]]:
-    pass
+    ...
 
 
 @overload
@@ -23,7 +23,7 @@ def batched_gather(
     number_of_workers: int,
     return_exceptions: bool = False,
 ) -> AsyncIterator[List[OUTPUT]]:
-    pass
+    ...
 
 
 async def batched_gather(  # type: ignore[misc]
