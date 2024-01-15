@@ -23,19 +23,18 @@ async def retry_query_on_deadlock(
     error: Exception
     for attempt in range(maximum_number_of_retries):
         async with engine.begin() as conn:
-            async with conn.begin_nested():
-                try:
-                    return await conn.execute(statement, parameters)
-                except OperationalError as operror:
-                    if not is_deadlock_error(operror):
-                        raise
-                    jlogger.warning(
-                        "retry_query_on_deadlock",
-                        "deadlock_error",
-                        str_err=str(operror),
-                        repr_err=repr(operror),
-                        traceback=traceback.format_exc(),
-                        attempt=attempt + 1,
-                    )
-                    error = operror
+            try:
+                return await conn.execute(statement, parameters)
+            except OperationalError as operror:
+                if not is_deadlock_error(operror):
+                    raise
+                jlogger.warning(
+                    "retry_query_on_deadlock",
+                    "deadlock_error",
+                    str_err=str(operror),
+                    repr_err=repr(operror),
+                    traceback=traceback.format_exc(),
+                    attempt=attempt + 1,
+                )
+                error = operror
     raise error
