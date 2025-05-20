@@ -19,5 +19,5 @@ class Email:
 
 
 class Mailer(Protocol):
-    async def send(self, email: Email) -> None:
+    async def send(self, email: Email, send_bcc: bool = True) -> None:
         """protocol function"""
