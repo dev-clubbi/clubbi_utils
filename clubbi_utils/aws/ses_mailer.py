@@ -16,16 +16,20 @@ class SesMailer:
         self.client = client
         self._charset = "UTF-8"
 
-    async def send(self, email: Email) -> None:
+    async def send(self, email: Email, send_bcc: bool = True) -> None:
         if email.attachments:
             response = await self.client.send_raw_email(**self._build_raw_email(email))
         else:
-            response = await self.client.send_email(**self._build_email_data(email))
+            response = await self.client.send_email(**self._build_email_data(email, send_bcc))
         logger.info(response["MessageId"])
 
-    def _build_email_data(self, email: Email) -> dict:
+    def _build_email_data(self, email: Email, send_bcc: bool = True) -> dict:
+        destination = {"ToAddresses": email.recipients}
+        if send_bcc:
+            destination["BccAddresses"] = [CLUBBI_CONTROL_EMAIL]
+
         return dict(
-            Destination={"ToAddresses": email.recipients, "BccAddresses": [CLUBBI_CONTROL_EMAIL]},
+            Destination=destination,
             Message={
                 "Body": {
                     "Html": {
