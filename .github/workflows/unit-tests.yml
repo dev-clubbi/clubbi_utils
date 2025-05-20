@@ -31,7 +31,7 @@ jobs:
 
       - name: Docker
         run: |
-          docker-compose up -d localstack postgres
+          docker compose up -d localstack postgres
           sleep 10
       
       
