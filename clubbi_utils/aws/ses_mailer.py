@@ -24,7 +24,7 @@ class SesMailer:
         logger.info(response["MessageId"])
 
     def _build_email_data(self, email: Email) -> dict:
-        return dict(
+        data = dict(
             Destination={"ToAddresses": email.recipients, "BccAddresses": [CLUBBI_CONTROL_EMAIL]},
             Message={
                 "Body": {
@@ -44,6 +44,10 @@ class SesMailer:
             },
             Source=email.sender,
         )
+        if email.headers and "X-SES-CONFIGURATION-SET" in email.headers:
+            data["ConfigurationSetName"] = email.headers["X-SES-CONFIGURATION-SET"]
+
+        return data
 
     def _build_raw_email(self, email: Email) -> dict:
         msg = MIMEMultipart()

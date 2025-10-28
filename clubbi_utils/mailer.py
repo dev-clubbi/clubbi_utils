@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Protocol, List
+from typing import Optional, Protocol, List
 
 
 @dataclass()
@@ -16,6 +16,7 @@ class Email:
     raw_text_body: str
     subject: str
     attachments: List[EmailAttachment] = field(default_factory=list)
+    headers: Optional[dict] = None
 
 
 class Mailer(Protocol):
