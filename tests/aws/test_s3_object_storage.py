@@ -107,11 +107,11 @@ class TestS3ObjectStorage(IsolatedAsyncioTestCase):
         link = await self._storage.create_presigned_url(key, expiration=3600)
         self.assertEqual(self._get_request_http(link), b"hello world")
 
-    # async def test_get_object_attribute(self) -> None:
-    #     now = datetime.utcnow().replace(tzinfo=tzutc())
-    #     key = await self._storage.put_object("file.txt", b"hello world")
-    #     info = await self._storage.get_object_attributes(key)
-    #     self.assertEqual(info.object_size, len(b"hello world"))
-    #     self.assertTrue(
-    #         now - timedelta(seconds=2) <= info.last_modified <= now + timedelta(seconds=2), (info.last_modified, now)
-    #     )
+    async def test_get_object_attribute(self) -> None:
+        now = datetime.utcnow().replace(tzinfo=tzutc())
+        key = await self._storage.put_object("file.txt", b"hello world")
+        info = await self._storage.get_object_attributes(key)
+        self.assertEqual(info.object_size, len(b"hello world"))
+        self.assertTrue(
+            now - timedelta(seconds=2) <= info.last_modified <= now + timedelta(seconds=2), (info.last_modified, now)
+        )

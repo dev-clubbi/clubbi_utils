@@ -76,14 +76,13 @@ class S3ObjectStorage:
     async def get_object_attributes(self, key: str, full_key: bool = False) -> ObjectAttributes:
         if full_key is False:
             key = self._build_key(key)
-        response = await self._client.get_object_attributes(
+        response = await self._client.head_object(
             Bucket=self._bucket,
             Key=key,
-            ObjectAttributes=["LastModified", "ObjectSize"],
         )
         return ObjectAttributes(
             last_modified=response["LastModified"],
-            object_size=response["ObjectSize"],
+            object_size=response["ContentLength"]
         )
 
     async def list_objects(self, prefix: str = "") -> List[str]:
