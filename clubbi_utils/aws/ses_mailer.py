@@ -24,6 +24,7 @@ class SesMailer:
         logger.info(response["MessageId"])
 
     def _build_email_data(self, email: Email) -> dict:
+        print("actions")
         data = dict(
             Destination={"ToAddresses": email.recipients, "BccAddresses": [CLUBBI_CONTROL_EMAIL]},
             Message={
