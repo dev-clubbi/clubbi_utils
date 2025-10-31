@@ -24,7 +24,6 @@ class SesMailer:
         logger.info(response["MessageId"])
 
     def _build_email_data(self, email: Email) -> dict:
-        print("email")
         data = dict(
             Destination={"ToAddresses": email.recipients, "BccAddresses": [CLUBBI_CONTROL_EMAIL]},
             Message={
@@ -72,4 +71,13 @@ class SesMailer:
             part.add_header("Content-Disposition", "attachment", filename=attachment.name)
             msg.attach(part)
 
-        return dict(Source=email.sender, Destinations=email.recipients, RawMessage={"Data": msg.as_string()})
+        data = dict(
+            Source=email.sender,
+            Destinations=email.recipients,
+            RawMessage={"Data": msg.as_string()},
+        )
+
+        if email.headers and "X-SES-CONFIGURATION-SET" in email.headers:
+            data["ConfigurationSetName"] = email.headers["X-SES-CONFIGURATION-SET"]
+
+        return data
