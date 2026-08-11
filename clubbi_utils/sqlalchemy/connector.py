@@ -26,6 +26,7 @@ class SqlAlchemyConfig(BaseSettings):
     pool_max_size: int = 10
     pool_timeout: int = 30  # default query timeout
     pool_recycle: int = -1
+    pool_pre_ping: bool = True
     echo: bool = False
     driver_name: str
 
@@ -52,6 +53,7 @@ class SqlAlchemyConfig(BaseSettings):
             max_overflow=self.pool_max_size - self.pool_min_size,
             pool_timeout=self.pool_timeout,
             pool_recycle=self.pool_recycle,
+            pool_pre_ping=self.pool_pre_ping,
         )
 
         return engine
